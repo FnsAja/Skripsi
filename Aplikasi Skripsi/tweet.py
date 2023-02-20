@@ -15,7 +15,7 @@ def appendData(query):
     tweets = []
     for tweet in sntwitter.TwitterSearchScraper(query).get_items():
         print(tweet.date)
-        tweets.append([str(tweet.date).split(' ')[0], ' ', re.sub('http://\S+|https://\S+|\@+|\#+|\##+', '', str(tweet.rawContent))])
+        tweets.append([str(tweet.date).split(' ')[0], ' ', re.sub('http://\S+|https://\S+|@\S+|#\S+|##\S+', '', str(tweet.rawContent))])
     
     return tweets
 
@@ -33,6 +33,7 @@ def insertToExcel(tweets, name):
         
     print("success")
 
-name = "Ganjar Pranowo"
+name = "Prabowo Subianto"
+
 tweets = query(name)
 insertToExcel(tweets, name)
