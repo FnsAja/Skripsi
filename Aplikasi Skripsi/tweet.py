@@ -34,7 +34,6 @@ def insertToExcel(tweets, name):
     print("success")
 
 name = "Prabowo Subianto"
-
 tweets = query(name)
 insertToExcel(tweets, name)
 
