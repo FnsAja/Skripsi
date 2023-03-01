@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              
+            }
+          }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-300">
+    <h2 class="header">Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+    
+    <ul>
+        <li>Get Data</li>
+        <li>Train</li>
+        <li>Test</li>
+    </ul>
+
+    <p>Masukan file Excel / CSV untuk melakukan training pada mesin</p>
+
+    <form enctype="multipart/form-data" action="__URL__" method="post">
+      <input type="file" name="fileTrain">
+      <Button name="submit">Submit File</Button>
+    </form>
+</body>
+</html>
