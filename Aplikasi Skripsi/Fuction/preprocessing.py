@@ -1,20 +1,67 @@
-from sklearn import datasets, svm, metrics
+import pandas as pd 
+import re
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn import svm, metrics
 
-cancer = datasets.load_breast_cancer()
+data_source_url = "./Datatest.csv"
+tweets = pd.read_csv(data_source_url, delimiter=";")
 
-# 70% train, 30% test -> (test size)
-X_train, X_test, Y_train, Y_test = train_test_split(cancer.data, cancer.target, test_size=0.3, random_state=110)
+features = tweets.iloc[:, 1].values
+labels = tweets.iloc[:, 0].values
 
-# SVM Model
-clf = svm.SVC(kernel='rbf')
+processed_features = []
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
+list_stopwords = set(stopwords.words('indonesian'))
+
+for sentences in features:
+    # Remove Special Character
+    temporary = re.sub(r'\W', ' ', str(sentences))
+
+    # Remove Number
+    temporary = re.sub(r'\d', ' ', temporary)
+
+    # Remove Single Character
+    temporary = re.sub(r'\s+[a-zA-Z]\s+', ' ', temporary)
+
+    # Remove Many Spaces
+    temporary = re.sub(r'\s+', ' ', temporary.strip(), flags=re.I)
+
+    # Lowering Case
+    temporary = temporary.lower()
+
+    # Stemming Bahasa Indonesia
+    temporary = stemmer.stem(temporary)
+
+    # Tokenize
+    token_result = word_tokenize(temporary)
+    
+    # Remove Stop Words
+    stopwords_result = [word for word in token_result if not word in list_stopwords]
+
+    # Back To String
+    temporary = ' '.join(map(str, stopwords_result))
+
+    # Tambahkan kedalam list
+    processed_features.append(temporary)
+
+vectorizer = TfidfVectorizer()
+X_train, X_test, y_train, y_test = train_test_split(processed_features, labels, test_size=0.4, random_state=0)
+train_processed_features = vectorizer.fit_transform(X_train)
+test_processed_features = vectorizer.transform(X_test)
+
+clf = svm.SVC(kernel="rbf")
 
 # Train Model using fit()
-clf.fit(X_train, Y_train)
+clf.fit(train_processed_features, y_train)
 
 # Predict
-y_pred = clf.predict(X_test)
+y_pred = clf.predict(test_processed_features)
 
-print("Accuracy : ", metrics.accuracy_score(Y_test, y_pred))
-print("Precision : ", metrics.precision_score(Y_test, y_pred))
-print("Recall : ", metrics.recall_score(Y_test, y_pred))
+print("Accuracy : ", metrics.accuracy_score(y_test, y_pred))
+print("Precision : ", metrics.precision_score(y_test, y_pred, average='micro'))
+print("Recall : ", metrics.recall_score(y_test, y_pred, average='micro'))
