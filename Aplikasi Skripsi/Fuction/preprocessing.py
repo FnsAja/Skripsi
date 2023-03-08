@@ -1,12 +1,29 @@
 import pandas as pd 
 import re
-import "https://github.com/victoriasovereigne/tesaurus.git"
+import tesaurus.tesaurus as ts
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split, cross_validate
-from sklearn import svm, metrics
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
+from sklearn import svm
+
+def wordElongationFilter(sentence):
+    pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
+    return pattern.sub(r"\1", sentence)
+
+def synonymWordFilter(list):
+    list_synonym = []
+    filtered_list = []
+    for word in list:
+        if word not in list_synonym and word not in filtered_list:
+            filtered_list.append(word)
+        else:
+            continue
+
+        list_synonym.extend(ts.getSinonim(word))
+
+    return filtered_list
 
 data_source_url = "./Datatest.csv"
 tweets = pd.read_csv(data_source_url, delimiter=";")
@@ -17,7 +34,10 @@ labels = tweets.iloc[:, 0].values
 processed_features = []
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
-list_stopwords = set(stopwords.words('indonesian'))
+list_stopwords = stopwords.words('indonesian')
+new_stopwords = open('./NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
+list_stopwords.extend(new_stopwords)
+# list_slangwords = 
 
 for sentences in features:
     # Remove Special Character
@@ -35,6 +55,9 @@ for sentences in features:
     # Lowering Case
     temporary = temporary.lower()
 
+    # Word Elongation Removal
+    temporary = wordElongationFilter(temporary)
+
     # Stemming Bahasa Indonesia
     temporary = stemmer.stem(temporary)
 
@@ -43,32 +66,31 @@ for sentences in features:
     
     # Remove Stop Words
     stopwords_result = [word for word in token_result if not word in list_stopwords]
-    print("Before : ", stopwords_result)
     
     # Synonym Words
-    synonym = map(tesaurus.getSinonim(), stopwords_result)
-    print("Sinonim : ", synonym)
+    synonym = synonymWordFilter(stopwords_result)
     
     # Back To String
-    temporary = ' '.join(map(str, stopwords_result))
+    temporary = ' '.join(map(str, synonym))
 
     # Tambahkan kedalam list
     processed_features.append(temporary)
 
-# vectorizer = TfidfVectorizer()
-# for i in range(1, 9):
-#     X_train, X_test, y_train, y_test = train_test_split(processed_features, labels, test_size=i * 0.1, random_state=0)
-#     train_processed_features = vectorizer.fit_transform(X_train)
-#     test_processed_features = vectorizer.transform(X_test)
+vectorizer = TfidfVectorizer()
+processed_features = vectorizer.fit_transform(processed_features)
+# X_train, X_test, y_train, y_test = train_test_split(processed_features, labels, test_size=0.3, random_state=0)
+# train_processed_features = vectorizer.fit_transform(X_train)
+# test_processed_features = vectorizer.transform(X_test)
 
-#     clf = svm.SVC(kernel="rbf")
 
-#     # Train Model using fit()
-#     clf.fit(train_processed_features, y_train)
+# Train Model using fit()
+# clf.fit(train_processed_features, y_train)
 
-#     # Predict
-#     y_pred = clf.predict(test_processed_features)
+# # Predict
+# y_pred = clf.predict(test_processed_features)
 
-#     print("Accuracy K-" + i + " : ", metrics.accuracy_score(y_test, y_pred))
-#     print("Precision : ", metrics.precision_score(y_test, y_pred, average='micro'))
-#     print("Recall : ", metrics.recall_score(y_test, y_pred, average='micro'))
+clf = svm.SVC(kernel="rbf")
+kv = KFold(n_splits=10, random_state=40, shuffle=True)
+
+# for index, res in enumerate(result):
+#     print("Fold ke-" + str(index+1) + " : Accuracy(" + str(res['accuracy']) + "), Recall(" + str(res['recall']) + "), Precision(" + str(res['precision']) + "), F1 Score(" + str(res['f1_score']) + ")")
