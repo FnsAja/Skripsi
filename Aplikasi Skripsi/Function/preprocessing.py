@@ -1,14 +1,15 @@
 import pandas as pd 
 import re
+import json
 import tesaurus.tesaurus as ts
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
-from sklearn import svm
+from sklearn.model_selection import train_test_split, cross_val_score, cross_validate, KFold
+from sklearn import svm, metrics
 
-def wordElongationFilter(sentence):
+def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
     return pattern.sub(r"\1", sentence)
 
@@ -20,9 +21,21 @@ def synonymWordFilter(list):
             filtered_list.append(word)
         else:
             continue
-
+        
         list_synonym.extend(ts.getSinonim(word))
 
+    return filtered_list
+
+def slangWordFilter(list):
+    filtered_list = []
+    
+    for word in list:
+        if word in list_slangwords.keys():
+            filtered_list.append(list_slangwords[word])
+        else:
+            filtered_list.append(word)
+    
+    # print(filtered_list)
     return filtered_list
 
 data_source_url = "./Datatest.csv"
@@ -32,12 +45,17 @@ features = tweets.iloc[:, 1].values
 labels = tweets.iloc[:, 0].values
 
 processed_features = []
+
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
+
 list_stopwords = stopwords.words('indonesian')
+
 new_stopwords = open('./NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
 list_stopwords.extend(new_stopwords)
-# list_slangwords = 
+
+list_slangwords = json.load(open('./NLP_bahasa_resources/combined_slang_words.txt'))
+
 
 for sentences in features:
     # Remove Special Character
@@ -55,8 +73,8 @@ for sentences in features:
     # Lowering Case
     temporary = temporary.lower()
 
-    # Word Elongation Removal
-    temporary = wordElongationFilter(temporary)
+    # Long Word Removal ex : aamiiinn => amin
+    temporary = longWordRemoval(temporary)
 
     # Stemming Bahasa Indonesia
     temporary = stemmer.stem(temporary)
@@ -67,30 +85,40 @@ for sentences in features:
     # Remove Stop Words
     stopwords_result = [word for word in token_result if not word in list_stopwords]
     
+    # Remove Slang Words
+    slangwords_result = slangWordFilter(stopwords_result)
+    
     # Synonym Words
-    synonym = synonymWordFilter(stopwords_result)
+    synonym = synonymWordFilter(slangwords_result)
     
     # Back To String
     temporary = ' '.join(map(str, synonym))
+    
+    # Remove Multiple Word
+    temporary = ' '.join(set(temporary.split()))
 
     # Tambahkan kedalam list
     processed_features.append(temporary)
 
 vectorizer = TfidfVectorizer()
 processed_features = vectorizer.fit_transform(processed_features)
-# X_train, X_test, y_train, y_test = train_test_split(processed_features, labels, test_size=0.3, random_state=0)
-# train_processed_features = vectorizer.fit_transform(X_train)
-# test_processed_features = vectorizer.transform(X_test)
-
-
-# Train Model using fit()
-# clf.fit(train_processed_features, y_train)
-
-# # Predict
-# y_pred = clf.predict(test_processed_features)
-
 clf = svm.SVC(kernel="rbf")
-kv = KFold(n_splits=10, random_state=40, shuffle=True)
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
-# for index, res in enumerate(result):
-#     print("Fold ke-" + str(index+1) + " : Accuracy(" + str(res['accuracy']) + "), Recall(" + str(res['recall']) + "), Precision(" + str(res['precision']) + "), F1 Score(" + str(res['f1_score']) + ")")
+score = cross_val_score(clf, processed_features, labels, cv=10).mean()
+
+print(len(processed_features))
+
+# i = 1
+# for train_index, test_index in kf.split(processed_features, labels):
+    # clf.fit(processed_features[train_index], labels[train_index])
+    # y_predict = clf.predict(processed_features[test_index])
+    
+    # print("-----------------------------------------------------------------------")
+    # print(f"Accuracy - {i}: ", metrics.accuracy_score(labels[test_index], y_predict))
+    # print(f"Precision - {i}: ", metrics.precision_score(labels[test_index], y_predict))
+    # print(f"Recall - {i}: ", metrics.recall_score(labels[test_index], y_predict))
+    # print(f"AUC - {i}: ", metrics.roc_auc_score(labels[test_index], y_predict))
+    # print("-----------------------------------------------------------------------")
+    
+    # i += 1
