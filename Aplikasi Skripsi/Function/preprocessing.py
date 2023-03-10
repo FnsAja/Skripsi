@@ -1,7 +1,7 @@
 import pandas as pd 
 import re
 import json
-import tesaurus.tesaurus as ts
+import lib.tesaurus.tesaurus as ts
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -35,7 +35,6 @@ def slangWordFilter(list):
         else:
             filtered_list.append(word)
     
-    # print(filtered_list)
     return filtered_list
 
 data_source_url = "./Datatest.csv"
@@ -51,10 +50,10 @@ stemmer = factory.create_stemmer()
 
 list_stopwords = stopwords.words('indonesian')
 
-new_stopwords = open('./NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
+new_stopwords = open('./lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
 list_stopwords.extend(new_stopwords)
 
-list_slangwords = json.load(open('./NLP_bahasa_resources/combined_slang_words.txt'))
+list_slangwords = json.load(open('./lib/NLP_bahasa_resources/combined_slang_words.txt'))
 
 
 for sentences in features:
@@ -100,14 +99,17 @@ for sentences in features:
     # Tambahkan kedalam list
     processed_features.append(temporary)
 
-vectorizer = TfidfVectorizer()
-processed_features = vectorizer.fit_transform(processed_features)
-clf = svm.SVC(kernel="rbf")
-kf = KFold(n_splits=10, shuffle=True, random_state=42)
+# review_dict = {'tweet': processed_features, 'sentimen' : labels}
+# df = pd.DataFrame(review_dict, columns = ['tweet', 'sentimen'])
 
-score = cross_val_score(clf, processed_features, labels, cv=10).mean()
+# vectorizer = TfidfVectorizer()
+# processed_features = vectorizer.fit_transform(processed_features)
+# clf = svm.SVC(kernel="rbf")
+# kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
-print(len(processed_features))
+# score = cross_val_score(clf, processed_features, labels, cv=10).mean()
+
+# print(score)
 
 # i = 1
 # for train_index, test_index in kf.split(processed_features, labels):
