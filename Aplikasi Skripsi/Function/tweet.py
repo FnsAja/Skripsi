@@ -26,9 +26,9 @@ def insertToExcel(tweets, name):
     if os.path.exists(f"output_{name}.xlsx"):
         os.remove(f"output_{name}.xlsx")
         
-    df1.to_excel(f"output_{name}.xlsx_Jan")
-    df2.to_excel(f"output_{name}.xlsx_Feb")
-    df3.to_excel(f"output_{name}.xlsx_Mar")
+    df1.to_excel(f"output_{name}_Jan.xlsx")
+    df2.to_excel(f"output_{name}_Feb.xlsx")
+    df3.to_excel(f"output_{name}_Mar.xlsx")
         
     print("success")
 
@@ -39,15 +39,15 @@ def insertToCSV(tweets, name):
     if os.path.exists(f"output_{name}.csv"):
         os.remove(f"output_{name}.csv")
         
-    df1.to_csv(f"output_{name}.csv_Jan")
-    df2.to_csv(f"output_{name}.csv_Feb")
-    df3.to_csv(f"output_{name}.csv_Mar")
+    df1.to_csv(f"output_{name}_Jan.csv")
+    df2.to_csv(f"output_{name}_Feb.csv")
+    df3.to_csv(f"output_{name}_Mar.csv")
         
     print("success")
 
-# name = "Prabowo Subianto"
-# tweets = query(name)
-# insertToExcel(tweets, name)
+name = "Ganjar Pranowo"
+tweets = query(name)
+insertToExcel(tweets, name)
 # insertToCSV(tweets, name)
 
 # name = "Anies Baswedan"
