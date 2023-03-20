@@ -37,8 +37,10 @@ def slangWordFilter(list):
     
     return filtered_list
 
-data_source_url = "./Datatest.csv"
-tweets = pd.read_csv(data_source_url, delimiter=";")
+data_source_url = "../Anies_JanFeb (Done).xlsx"
+read_file = pd.read_excel(data_source_url)
+read_file.to_csv("Data.csv", index=None, header=True)
+tweets = pd.read_csv("Data.csv")
 
 features = tweets.iloc[:, 1].values
 labels = tweets.iloc[:, 0].values
@@ -99,28 +101,20 @@ for sentences in features:
     # Tambahkan kedalam list
     processed_features.append(temporary)
 
-# review_dict = {'tweet': processed_features, 'sentimen' : labels}
-# df = pd.DataFrame(review_dict, columns = ['tweet', 'sentimen'])
+vectorizer = TfidfVectorizer()
+processed_features = vectorizer.fit_transform(processed_features)
+clf = svm.SVC(kernel="rbf")
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
-# vectorizer = TfidfVectorizer()
-# processed_features = vectorizer.fit_transform(processed_features)
-# clf = svm.SVC(kernel="rbf")
-# kf = KFold(n_splits=10, shuffle=True, random_state=42)
+score = cross_val_score(clf, processed_features, labels, cv=kf)
 
-# score = cross_val_score(clf, processed_features, labels, cv=10).mean()
-
-# print(score)
-
-# i = 1
-# for train_index, test_index in kf.split(processed_features, labels):
-    # clf.fit(processed_features[train_index], labels[train_index])
-    # y_predict = clf.predict(processed_features[test_index])
+i = 1
+for train_index, test_index in kf.split(processed_features, labels):
+    clf.fit(processed_features[train_index], labels[train_index])
+    y_predict = clf.predict(processed_features[test_index])
     
-    # print("-----------------------------------------------------------------------")
-    # print(f"Accuracy - {i}: ", metrics.accuracy_score(labels[test_index], y_predict))
-    # print(f"Precision - {i}: ", metrics.precision_score(labels[test_index], y_predict))
-    # print(f"Recall - {i}: ", metrics.recall_score(labels[test_index], y_predict))
-    # print(f"AUC - {i}: ", metrics.roc_auc_score(labels[test_index], y_predict))
-    # print("-----------------------------------------------------------------------")
-    
-    # i += 1
+    for index, content in enumerate(y_predict):
+        if content != labels[test_index][index]:
+            print(f"Fold {i} Index {index} Labels {content} Correct {labels[test_index][index]}")
+
+    i += 1
