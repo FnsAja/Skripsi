@@ -113,8 +113,6 @@ calculate_features = vectorizer.fit_transform(processed_features)
 clf = svm.SVC(kernel="rbf")
 kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
-# score = cross_val_score(clf, calculate_features, labels, cv=kf)
-
 i = 1
 for train_index, test_index in kf.split(calculate_features, labels):
     X_train = calculate_features[train_index]
@@ -125,15 +123,6 @@ for train_index, test_index in kf.split(calculate_features, labels):
     # Train
     clf.fit(X_train, y_train)
     y_predict = clf.predict(X_test)
-    
-    # Display Confusion Matrix
-    confusion_matrix = metrics.confusion_matrix(y_test, y_predict)
-    confusion_matrix = numpy.flipud(confusion_matrix)
-    confusion_matrix = numpy.fliplr(confusion_matrix)
-    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
-    cm_display.plot()
-    # plt.show()
-    print(metrics.classification_report(y_test, y_predict))
 
     countNetral = 0
     countPositive = 0
@@ -146,40 +135,48 @@ for train_index, test_index in kf.split(calculate_features, labels):
     trueNegative = 0
     trueNetral = 0
 
-    # for index, content in enumerate(y_predict):
+    for index, content in enumerate(y_predict):
         # Prediksi Salah
         # if content != labels[test_index][index]:        
         #     print(f"Fold {i} Isi {processed_features[test_index[index]]} Labels {content} Correct {labels[test_index[index]]}")
         
         # Jumlah Positif, Negatif dan Netral
-        # if content == 0:
-        #     countNetral += 1            
-        # elif content == 1:
-        #     countPositive += 1            
-        # elif content == -1:
-        #     countNegative += 1
+        if content == 0:
+            countNetral += 1            
+        elif content == 1:
+            countPositive += 1            
+        elif content == -1:
+            countNegative += 1
 
         # Jumlah True Positive, False Positive, True Netral, False Netral, True Negative, False Negative
-        # if content == 0:
-        #     if content == labels[test_index[index]]:
-        #         trueNetral += 1
-        #     else:
-        #         falseNetral += 1
-        # elif content == 1:
-        #     if content == labels[test_index[index]]:
-        #         truePositive += 1
-        #     else:
-        #         falsePositive += 1
-        # elif content == -1:
-        #     if content == labels[test_index[index]]:
-        #         trueNegative += 1
-        #     else:
-        #         falseNegative += 1
+        if content == 0:
+            if content == labels[test_index[index]]:
+                trueNetral += 1
+            else:
+                falseNetral += 1
+        elif content == 1:
+            if content == labels[test_index[index]]:
+                truePositive += 1
+            else:
+                falsePositive += 1
+        elif content == -1:
+            if content == labels[test_index[index]]:
+                trueNegative += 1
+            else:
+                falseNegative += 1
 
-    # print(f"Fold {i} Positif {countPositive} Netral {countNetral} Negatif {countNegative}")
-    
-    # print(f"Fold {i} TrueP {truePositive} FalseP {falsePositive}")
-    # print(f"Fold {i} TrueNt {trueNetral} FalseNt {falseNetral}")
-    # print(f"Fold {i} TrueN {trueNegative} FalseN {falseNegative}")
+    print(f"Fold {i} Positif {countPositive} Netral {countNetral} Negatif {countNegative}")
+    print(f"Fold {i} TrueP {truePositive} FalseP {falsePositive}")
+    print(f"Fold {i} TrueNt {trueNetral} FalseNt {falseNetral}")
+    print(f"Fold {i} TrueN {trueNegative} FalseN {falseNegative}")
+
+    # Display Confusion Matrix
+    confusion_matrix = metrics.confusion_matrix(y_test, y_predict)
+    confusion_matrix = numpy.flipud(confusion_matrix)
+    confusion_matrix = numpy.fliplr(confusion_matrix)
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
+    cm_display.plot()
+    # plt.show()
+    print(metrics.classification_report(y_test, y_predict, zero_division=0))
 
     i += 1
