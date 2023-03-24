@@ -1,20 +1,12 @@
-from sklearn import datasets, svm, metrics
-from sklearn.model_selection import train_test_split
+import joblib
+import pandas as pd
+import preprocessing
 
-cancer = datasets.load_breast_cancer()
+clf = joblib.load("svm.pkl")
+tweets = pd.read_csv("DataTest.csv", sep="delimiter", header=0, engine="python")
+features = tweets.iloc[:, 0].values
 
-# 70% train, 30% test -> (test size)
-X_train, X_test, Y_train, Y_test = train_test_split(cancer.data, cancer.target, test_size=0.3, random_state=110)
+processed_features = preprocessing.preprocessing(features=features)
+calculated_features = preprocessing.weighting(processed_features)
 
-# SVM Model
-clf = svm.SVC(kernel='rbf')
-
-# Train Model using fit()
-clf.fit(X_train, Y_train)
-
-# Predict
-y_pred = clf.predict(X_test)
-
-print("Accuracy : ", metrics.accuracy_score(Y_test, y_pred))
-print("Precision : ", metrics.precision_score(Y_test, y_pred))
-print("Recall : ", metrics.recall_score(Y_test, y_pred))
+print(clf.predict(calculated_features))
