@@ -43,6 +43,9 @@ def slangWordFilter(list, list_slangwords):
 def prepareData(data_source_url):   
     read_file = pd.read_excel(data_source_url)
     read_file.to_csv("Data.csv", index=None, header=True)
+    read_file = read_file.drop(read_file.columns[0], axis=1)
+    read_file.to_csv("DataTest.csv", index=None, header=True)
+    
     tweets = pd.read_csv("Data.csv")
 
     features = tweets.iloc[:, 1].values
@@ -208,9 +211,9 @@ def trainModel(calculate_features, labels):
     
     return best_fold
 
-data_source_url = "../Anies_JanFeb (Done).xlsx"
+# data_source_url = "../Anies_JanFeb (Done).xlsx"
 # data_source_url = "../Ganjar_JanFeb (Done).xlsx"
-# data_source_url = "../Prabowo_JanFeb (Done).xlsx"
+data_source_url = "../Prabowo_JanFeb (Done).xlsx"
 
 features, labels = prepareData(data_source_url=data_source_url)
 processed_features = preprocessing(features=features)

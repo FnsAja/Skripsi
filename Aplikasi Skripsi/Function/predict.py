@@ -3,7 +3,7 @@ import pandas as pd
 import preprocessing
 
 clf = joblib.load("svm.pkl")
-tweets = pd.read_csv("DataTest.csv", sep="delimiter", header=0, engine="python")
+tweets = pd.read_csv("DataTest.csv", sep="delimiter", header=1, engine="python")
 features = tweets.iloc[:, 0].values
 
 processed_features = preprocessing.preprocessing(features=features)
