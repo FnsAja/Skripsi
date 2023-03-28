@@ -3,6 +3,7 @@ import numpy
 import re
 import json
 import joblib
+import os
 import lib.tesaurus.tesaurus as ts
 import matplotlib.pyplot as plt
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -41,15 +42,16 @@ def slangWordFilter(list, list_slangwords):
     return filtered_list
 
 def prepareData(data_source_url):   
-    read_file = pd.read_excel(data_source_url)
-    read_file.to_csv("Data.csv", index=None, header=True)
-    read_file = read_file.drop(read_file.columns[0], axis=1)
-    read_file.to_csv("DataTest.csv", index=None, header=True)
-    
-    tweets = pd.read_csv("Data.csv")
+    if not os.path.exists('Process'):
+        os.mkdir('Process')
 
-    features = tweets.iloc[:, 1].values
-    labels = tweets.iloc[:, 0].values
+    read_file = pd.read_excel(data_source_url)
+    read_file.to_csv("Process/Data.csv", index=None, header=True)
+    
+    tweets = pd.read_csv("Process/Data.csv")
+
+    features = tweets.iloc[:, 2].values
+    labels = tweets.iloc[:, 1].values
 
     return features, labels
    
@@ -179,11 +181,6 @@ def trainModel(calculate_features, labels):
                 else:
                     falseNegative += 1
 
-        # print(f"Fold {i} Positif {countPositive} Netral {countNetral} Negatif {countNegative}")
-        # print(f"Fold {i} TrueP {truePositive} FalseP {falsePositive}")
-        # print(f"Fold {i} TrueNt {trueNetral} FalseNt {falseNetral}")
-        # print(f"Fold {i} TrueN {trueNegative} FalseN {falseNegative}")
-
         # Display Confusion Matrix
         confusion_matrix = metrics.confusion_matrix(y_test, y_predict)
         confusion_matrix = numpy.flipud(confusion_matrix)
@@ -207,17 +204,16 @@ def trainModel(calculate_features, labels):
 
         i += 1
     
-    joblib.dump(best_fold['clf'], "svm.pkl")
+    joblib.dump(best_fold['clf'], "Model/svm.pkl")
     
     return best_fold
 
-# data_source_url = "../Anies_JanFeb (Done).xlsx"
-# data_source_url = "../Ganjar_JanFeb (Done).xlsx"
-data_source_url = "../Prabowo_JanFeb (Done).xlsx"
+def startTrain(data_source_url):
+    features, labels = prepareData(data_source_url=data_source_url)
+    processed_features = preprocessing(features=features)
+    calculate_features = weighting(processed_features=processed_features)
+    best_fold = trainModel(calculate_features=calculate_features, labels=labels)
 
-features, labels = prepareData(data_source_url=data_source_url)
-processed_features = preprocessing(features=features)
-calculate_features = weighting(processed_features=processed_features)
-best_fold = trainModel(calculate_features=calculate_features, labels=labels)
+    return best_fold
 
 

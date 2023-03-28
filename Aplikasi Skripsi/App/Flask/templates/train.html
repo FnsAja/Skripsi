@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentiment Analysis</title>
-</head>
-<body class="bg-slate-300">
-    <h2 class="header">Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
-    
-    <ul>
-        <li>Get Data</li>
-        <li>Train</li>
-        <li>Test</li>
-    </ul>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment Analysis (Train Data)</title>
+    <!-- <script src="../static/tailwind.config.js"></script>
+    <link rel="stylesheet" href="../static/output/style.css"> -->
+  </head>
 
-    <p>Masukan file Excel / CSV untuk melakukan training pada mesin</p>
+  <body>
+    <a href="/scrap">Scrap</a>
+    <a href="/train">Train</a>
 
-    <form enctype="multipart/form-data" action="__URL__" method="post">
-      <input type="file" name="fileTrain">
-      <Button name="submit">Submit File</Button>
+    <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+
+    <p>Masukan data yang telah dilabeling</p>
+
+    <form action="/train" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" />
+      <input type="submit" />
     </form>
-</body>
+
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %} {{ message }} {% endfor %} {% endif %} {% endwith %}
+    {% if pesan: %}
+    <p>{{ pesan['name'] }}</p>
+    <p>{{ pesan['start'] }}</p>
+    <p>{{ pesan['end'] }}</p>
+    {% endif %}
+  </body>
 </html>

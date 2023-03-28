@@ -10,37 +10,23 @@
 </head>
 <body>
 
+    <a href="/scrap">Scrap</a>
+    <a href="/train">Train</a>
+
     <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
 
     <p>Klik tombol dibawah ini untuk mendownload file twitter capres</p>
 
-    <form action="/" method="post">
+    <form action="/scrap" method="post">
         <select name="name">
-            <option>Pilih Calon</option>
+            <option value="">Pilih Calon</option>
             <option value="Ganjar Pranowo">Ganjar Pranowo</option>
             <option value="Anies Baswedan">Anies Baswedan</option>
             <option value="Prabowo Subianto">Prabowo Subianto</option>
         </select>
         <input type="date" name="start">
         <input type="date" name="end">
-        <input type="submit" value="Submit" class="submitBtn">
+        <input type="submit">
     </form>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    {% if message: %}
-        <p>{{ message['name'] }}</p>
-        <p>{{ message['start'] }}</p>
-        <p>{{ message['end'] }}</p>
-
-        <a href="/saveFile/{{ message['name'] }}">Save Me</a>
-    {% endif %}
-    
 </body>
 </html>
