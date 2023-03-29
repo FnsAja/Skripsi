@@ -43,15 +43,17 @@ def slangWordFilter(list, list_slangwords):
 
 def prepareData(data_source_url):   
     if not os.path.exists('Process'):
-        os.mkdir('Process')
+        os.makedirs('Process')
 
     read_file = pd.read_excel(data_source_url)
-    read_file.to_csv("Process/Data.csv", index=None, header=True)
+    read_file.to_csv("Process/Data.csv", index=1, header=True)
+    read_file = read_file.drop('Sentiment', axis=1)
+    read_file.to_excel("Process/DataTest.xlsx", index=1, header=True)
     
     tweets = pd.read_csv("Process/Data.csv")
 
-    features = tweets.iloc[:, 2].values
-    labels = tweets.iloc[:, 1].values
+    features = tweets.loc[:, 'Tweet'].values
+    labels = tweets.loc[:, 'Sentiment'].values
 
     return features, labels
    
@@ -61,10 +63,10 @@ def preprocessing(features):
 
     list_stopwords = stopwords.words('indonesian')
 
-    new_stopwords = open('./lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
+    new_stopwords = open('../../Function/lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
     list_stopwords.extend(new_stopwords)
 
-    list_slangwords = json.load(open('./lib/NLP_bahasa_resources/combined_slang_words.txt'))
+    list_slangwords = json.load(open('../../Function/lib/NLP_bahasa_resources/combined_slang_words.txt'))
     
     processed_features = []
 
@@ -129,7 +131,10 @@ def trainModel(calculate_features, labels):
         "accuracy": 0
     }
     
-    i = 1
+    all_fold = []
+    temp_fold = {}
+        
+    i = 0
     for train_index, test_index in kf.split(calculate_features, labels):
         X_train = calculate_features[train_index]
         y_train = labels[train_index]
@@ -202,18 +207,33 @@ def trainModel(calculate_features, labels):
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
 
+        temp_fold['fold'] = i
+        temp_fold['clf'] = clf
+        temp_fold['accuracy'] = accuracy
+        temp_fold['score_cm'] = score_cm
+        temp_fold['cm_display'] = cm_display
+        temp_fold['confusion_matrix'] = confusion_matrix
+        temp_fold['count'] = [countPositive, countNetral, countNegative]
+        temp_fold['true'] = [truePositive, trueNetral, trueNegative]
+        temp_fold['false'] = [falsePositive, falseNetral, falseNegative]
+        
+        all_fold.append(temp_fold.copy())
+
         i += 1
+        
+    if not os.path.exists('Model'):
+        os.mkdir('Model')
     
-    joblib.dump(best_fold['clf'], "Model/svm.pkl")
+    joblib.dump(best_fold['clf'], 'Model/svm.pkl')
     
-    return best_fold
+    return best_fold, all_fold
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
     processed_features = preprocessing(features=features)
     calculate_features = weighting(processed_features=processed_features)
-    best_fold = trainModel(calculate_features=calculate_features, labels=labels)
+    best_fold, all_fold = trainModel(calculate_features=calculate_features, labels=labels)
 
-    return best_fold
+    return best_fold, all_fold
 
 

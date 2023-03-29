@@ -21,7 +21,6 @@ def insertToExcel(name, start_date, end_date):
     tweets = query(name, start_date, end_date)
     
     df = pd.DataFrame(tweets, columns=['Sentiment', 'Tweet']).drop_duplicates(subset='Tweet')
-    df1 = df.drop('Sentiment', axis=1)
     
     if not os.path.exists("Data"):
         os.makedirs("Data")
@@ -29,12 +28,12 @@ def insertToExcel(name, start_date, end_date):
     if os.path.exists(f"Data/output_{name}.xlsx"):
         os.remove(f"Data/output_{name}.xlsx")
 
-    if os.path.exists(f"Data/output_{name}_DataTest.xlsx"):
-        os.remove(f"Data/output_{name}_DataTest.xlsx")
+    # if os.path.exists(f"Data/output_{name}_DataTest.xlsx"):
+    #     os.remove(f"Data/output_{name}_DataTest.xlsx")
         
     df.to_excel(f"Data/output_{name}.xlsx")
-    df1.to_excel(f"Data/output_{name}_DataTest.xlsx")
+    # df1.to_excel(f"Data/output_{name}_DataTest.xlsx")
 
-    with ZipFile(f'Data/Data_{name}.zip', 'w') as zipFile:
-        zipFile.write(f'Data/output_{name}.xlsx')
-        zipFile.write(f'Data/output_{name}_DataTest.xlsx')
+    # with ZipFile(f'Data/Data_{name}.zip', 'w') as zipFile:
+    #     zipFile.write(f'Data/output_{name}.xlsx')
+    #     zipFile.write(f'Data/output_{name}_DataTest.xlsx')

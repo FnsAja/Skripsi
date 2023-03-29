@@ -1,0 +1,17 @@
+{% with judul="Predict" %}
+    {% include "component/header.html" %}
+{% endwith %}
+
+  <body>
+    {% include "component/navbar.html" %}
+
+    <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+
+    <p>Masukan datatest</p>
+
+    <form action="/predict" method="post" enctype="multipart/form-data">
+      <input type="file" name="file"/>
+      <input type="submit"/>
+    </form>
+  </body>
+</html>

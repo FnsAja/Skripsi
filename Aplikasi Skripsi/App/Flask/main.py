@@ -36,14 +36,22 @@ def scrap():
 @app.route('/saveFile/<name>')
 def save_excel(name):
     return send_file(
-        f'Data/Data_{name}.zip',
-        mimetype='application/zip',
-        download_name='Data.zip',
+        f'Data/output_{name}.xlsx',
+        download_name='Data.xlsx',
+        as_attachment=True
+    )
+    
+@app.route('/saveFileTest')
+def save_excel_test():
+    return send_file(
+        f'Process/DataTest.xlsx',
+        download_name='DataTest.xlsx',
         as_attachment=True
     )
 
 @app.route('/train', methods=('GET', 'POST'))
 def train():
+    status = ''
     if request.method == 'POST':
         file = request.files['file']
 
@@ -55,6 +63,23 @@ def train():
 
             file.save('TrainData/Train.xlsx')
 
-            startTrain('TrainData/Train.xlsx')
+            status = 'complete'
+
+            best_fold, all_fold = startTrain('TrainData/Train.xlsx')
     
-    return render_template('train.html')
+    return render_template('train.html', status = status)
+
+@app.route('/predict', methods=('GET', 'POST'))
+def predict():
+    if request.method == 'POST':
+        file = request.files['file']
+        
+        if file.filename == '':
+            flash('Please Input File')
+        else:
+            if not os.path.exists('TestData'):
+                os.mkdir('TestData')
+                
+            file.save('TestData/Test.xlsx')
+    
+    return render_template('predict.html')

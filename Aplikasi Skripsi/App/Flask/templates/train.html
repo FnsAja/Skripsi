@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sentiment Analysis (Train Data)</title>
-    <!-- <script src="../static/tailwind.config.js"></script>
-    <link rel="stylesheet" href="../static/output/style.css"> -->
-  </head>
+{% with judul="Train" %}
+    {% include "component/header.html" %}
+{% endwith %}
 
   <body>
-    <a href="/scrap">Scrap</a>
-    <a href="/train">Train</a>
+    {% include "component/navbar.html" %}
 
     <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
 
@@ -21,13 +13,9 @@
       <input type="file" name="file" />
       <input type="submit" />
     </form>
-
-    {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %} {{ message }} {% endfor %} {% endif %} {% endwith %}
-    {% if pesan: %}
-    <p>{{ pesan['name'] }}</p>
-    <p>{{ pesan['start'] }}</p>
-    <p>{{ pesan['end'] }}</p>
+    
+    {% if status == 'complete' %}
+      <a href="/saveFileTest">Download File Test</a>
     {% endif %}
   </body>
 </html>
