@@ -17,5 +17,13 @@
     {% if status == 'complete' %}
       <a href="/saveFileTest">Download File Test</a>
     {% endif %}
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
   </body>
 </html>

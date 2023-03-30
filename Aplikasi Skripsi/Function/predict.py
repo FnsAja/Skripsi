@@ -1,4 +1,5 @@
 import joblib
+import os
 import pandas as pd
 import preprocessing
 
@@ -18,5 +19,14 @@ def startPredict(pathModel, pathData):
     features = loadData(pathData)
     processed_features = preprocessing.preprocessing(features=features)
     calculated_features = preprocessing.weighting(processed_features)
+    result = clf.predict(calculated_features)
 
-    return features, clf.predict(calculated_features)
+    if not os.path.exists('TestData'):
+        os.mkdir('TestData')
+
+    data = {'Predict Result': result, 'Tweet': features}
+
+    df = pd.DataFrame(data)
+    df.to_excel('Process/DataPredict.xlsx')
+
+    return df

@@ -13,5 +13,17 @@
       <input type="file" name="file"/>
       <input type="submit"/>
     </form>
+
+    {% if status == 'complete' %}
+      <a href="/saveFilePredict">Download File Predict</a>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
   </body>
 </html>

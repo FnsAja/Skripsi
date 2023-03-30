@@ -48,7 +48,7 @@ def prepareData(data_source_url):
     read_file = pd.read_excel(data_source_url)
     read_file.to_csv("Process/Data.csv", index=1, header=True)
     read_file = read_file.drop('Sentiment', axis=1)
-    read_file.to_excel("Process/DataTest.xlsx", index=1, header=True)
+    read_file.to_csv("Process/DataTest.csv", index=1, header=True)
     
     tweets = pd.read_csv("Process/Data.csv")
 
