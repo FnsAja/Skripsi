@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 sys.path.append("D:\\Alfonso's Personal File\\Kuliah\\Skripsi\\Aplikasi Skripsi\\Function")
 
 from flask import Flask, render_template, request, flash, send_file, redirect, url_for
@@ -47,7 +48,10 @@ def train():
             status = 'complete'
 
             best_fold, all_fold = startTrain('TrainData/Train.xlsx')
-    
+            best_fold.pop("clf")
+
+            return render_template('train.html', status = status, best_fold = json.dumps(best_fold), all_fold = json.dumps(all_fold))
+        
     return render_template('train.html', status = status)
 
 @app.route('/predict', methods=('GET', 'POST'))

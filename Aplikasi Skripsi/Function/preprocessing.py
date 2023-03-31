@@ -134,7 +134,7 @@ def trainModel(calculate_features, labels):
     all_fold = []
     temp_fold = {}
         
-    i = 0
+    i = 1
     for train_index, test_index in kf.split(calculate_features, labels):
         X_train = calculate_features[train_index]
         y_train = labels[train_index]
@@ -201,18 +201,15 @@ def trainModel(calculate_features, labels):
             best_fold['clf'] = clf
             best_fold['accuracy'] = accuracy
             best_fold['score_cm'] = score_cm
-            best_fold['cm_display'] = cm_display
-            best_fold['confusion_matrix'] = confusion_matrix
+            best_fold['confusion_matrix'] = confusion_matrix.tolist()
             best_fold['count'] = [countPositive, countNetral, countNegative]
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
 
         temp_fold['fold'] = i
-        temp_fold['clf'] = clf
         temp_fold['accuracy'] = accuracy
         temp_fold['score_cm'] = score_cm
-        temp_fold['cm_display'] = cm_display
-        temp_fold['confusion_matrix'] = confusion_matrix
+        temp_fold['confusion_matrix'] = confusion_matrix.tolist()
         temp_fold['count'] = [countPositive, countNetral, countNegative]
         temp_fold['true'] = [truePositive, trueNetral, trueNegative]
         temp_fold['false'] = [falsePositive, falseNetral, falseNegative]

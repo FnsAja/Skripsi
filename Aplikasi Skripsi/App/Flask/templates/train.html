@@ -16,6 +16,10 @@
     
     {% if status == 'complete' %}
       <a href="/saveFileTest">Download File Test</a>
+
+      <div style="position: relative; height:40vh; width:80vw">
+        <canvas id="barChart"></canvas>
+      </div>
     {% endif %}
     
     {% with messages = get_flashed_messages() %}
@@ -25,5 +29,13 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
+
+    {% if status == 'complete' %}
+      <script>
+        let all_fold = JSON.parse({{ all_fold|tojson|safe }})
+        let best_fold = JSON.parse({{ best_fold|tojson|safe }})
+      </script>
+    {% endif %}
+    {% include "component/footer.html" %}
   </body>
 </html>
