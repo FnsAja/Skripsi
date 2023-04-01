@@ -128,7 +128,7 @@ def trainModel(calculate_features, labels):
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     
     best_fold = {
-        "accuracy": 0
+        "f1": 0
     }
     
     all_fold = []
@@ -190,16 +190,19 @@ def trainModel(calculate_features, labels):
         confusion_matrix = metrics.confusion_matrix(y_test, y_predict)
         confusion_matrix = numpy.flipud(confusion_matrix)
         confusion_matrix = numpy.fliplr(confusion_matrix)
-        score_cm = metrics.classification_report(y_test, y_predict, zero_division=0)
+        score_cm = metrics.classification_report(y_test, y_predict, zero_division=0, output_dict=True)
         accuracy = metrics.accuracy_score(y_test, y_predict)
         cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
         # cm_display.plot()
         # plt.show()
 
-        if best_fold['accuracy'] < accuracy:
+        if best_fold['f1'] < score_cm['macro avg']['f1-score']:
             best_fold['fold'] = i
             best_fold['clf'] = clf
             best_fold['accuracy'] = accuracy
+            best_fold['precision'] = score_cm['macro avg']['precision']
+            best_fold['recall'] = score_cm['macro avg']['recall']
+            best_fold['f1'] = score_cm['macro avg']['f1-score']
             best_fold['score_cm'] = score_cm
             best_fold['confusion_matrix'] = confusion_matrix.tolist()
             best_fold['count'] = [countPositive, countNetral, countNegative]
@@ -208,6 +211,9 @@ def trainModel(calculate_features, labels):
 
         temp_fold['fold'] = i
         temp_fold['accuracy'] = accuracy
+        temp_fold['precision'] = score_cm['macro avg']['precision']
+        temp_fold['recall'] = score_cm['macro avg']['recall']
+        temp_fold['f1'] = score_cm['macro avg']['f1-score']
         temp_fold['score_cm'] = score_cm
         temp_fold['confusion_matrix'] = confusion_matrix.tolist()
         temp_fold['count'] = [countPositive, countNetral, countNegative]

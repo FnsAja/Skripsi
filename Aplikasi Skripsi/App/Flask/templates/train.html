@@ -16,12 +16,16 @@
     
     {% if status == 'complete' %}
       <a href="/saveFileTest">Download File Test</a>
-
-      <div style="position: relative; height:40vh; width:80vw">
-        <canvas id="barChart"></canvas>
+      
+      <div class="content">
+        <div style="position: relative; height:40vh; width:80vw">
+          <canvas id="barChart"></canvas>
+        </div>
+        <div style="position: relative; height:40vh; width:80vw">
+          <canvas id="pieChart"></canvas>
+        </div>
       </div>
     {% endif %}
-    
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
@@ -36,6 +40,7 @@
         let best_fold = JSON.parse({{ best_fold|tojson|safe }})
       </script>
     {% endif %}
+
     {% include "component/footer.html" %}
   </body>
 </html>
