@@ -20,31 +20,35 @@ barChart = new Chart(ctx, {
     datasets: [
       {
         label: "Accuracy",
-        data: accuracy,
+        data: accuracy.map((acc) => acc * 100),
         borderWidth: 1,
         borderColor: "#D3D3D3",
         backgroundColor: "#9BD0F5",
+        maxBarThickness: 80,
       },
       {
         label: "Precision",
-        data: precision,
+        data: precision.map((prec) => prec * 100),
         borderWidth: 1,
         borderColor: "#D3D3D3",
         backgroundColor: "#FFB1C1",
+        maxBarThickness: 80,
       },
       {
         label: "Recall",
-        data: recall,
+        data: recall.map((rec) => rec * 100),
         borderWidth: 1,
         borderColor: "#D3D3D3",
         backgroundColor: "#77DD77",
+        maxBarThickness: 80,
       },
       {
         label: "F1 Score",
-        data: f1_score,
+        data: f1_score.map((f1) => f1 * 100),
         borderWidth: 1,
         borderColor: "#D3D3D3",
         backgroundColor: "#B19CD9",
+        maxBarThickness: 80,
       },
     ],
   },
@@ -92,9 +96,7 @@ barChart = new Chart(ctx, {
             return tooltipItems[0].dataset.label;
           },
           label: (tooltipItems) => {
-            return `Fold - ${tooltipItems.label} : ${(
-              tooltipItems.dataset.data[tooltipItems.dataIndex] * 100
-            ).toFixed(2)}%`;
+            return `Fold - ${tooltipItems.label} : ${(tooltipItems.dataset.data[tooltipItems.dataIndex]).toFixed(2)}%`;
           },
         },
       },
@@ -115,7 +117,7 @@ barChart = new Chart(ctx, {
 });
 
 ctx = document.getElementById("pieChart");
-barChart = new Chart(ctx, {
+pieChart = new Chart(ctx, {
   type: "pie",
   data: {
     labels: ["Negative", "Netral", "Positive"],
