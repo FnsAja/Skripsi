@@ -1,46 +1,51 @@
 {% with judul="Train" %}
-    {% include "component/header.html" %}
+{% include "component/header.html" %}
 {% endwith %}
 
-  <body>
-    {% include "component/navbar.html" %}
+<body>
+  {% include "component/navbar.html" %}
 
-    <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+  <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
 
-    <p>Masukan data yang telah dilabeling</p>
+  <p>Masukan data yang telah dilabeling</p>
 
-    <form action="/train" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" />
-      <input type="submit" />
-    </form>
-    
-    {% if status == 'complete' %}
-      <a href="/saveFileTest">Download File Test</a>
-      
-      <div class="content">
-        <div style="position: relative; height:40vh; width:80vw">
-          <canvas id="barChart"></canvas>
-        </div>
-        <div style="position: relative; height:40vh; width:80vw">
-          <canvas id="pieChart"></canvas>
-        </div>
-      </div>
+  <form action="/train" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <input type="submit" />
+  </form>
+
+  {% if status == 'complete' %}
+  <a href="/saveFileTest">Download File Test</a>
+
+  <div class="content">
+    <div style="position: relative; height:400px; width: 800px;">
+      <canvas id="barChart"></canvas>
+    </div>
+    <div style="position: relative; height:400px; width: 400px;">
+      <canvas id="pieChart"></canvas>
+    </div>
+    <div style="position: relative; height:400px; width: 400px;">
+      <img src="{{ url_for('TrainData', filename='TrainPlot.png') }}">
+    </div>
+  </div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
     {% endif %}
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          {{ message }}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+  {% endwith %}
 
-    {% if status == 'complete' %}
-      <script>
-        let all_fold = JSON.parse({{ all_fold|tojson|safe }})
-        let best_fold = JSON.parse({{ best_fold|tojson|safe }})
-      </script>
-    {% endif %}
+  {% if status == 'complete' %}
+  <script>
+    let all_fold = JSON.parse({{ all_fold| tojson | safe }})
+    let best_fold = JSON.parse({{ best_fold| tojson | safe }})
+  </script>
+  {% endif %}
 
-    {% include "component/footer.html" %}
-  </body>
+  {% include "component/footer.html" %}
+</body>
+
 </html>

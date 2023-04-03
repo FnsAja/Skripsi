@@ -96,7 +96,9 @@ barChart = new Chart(ctx, {
             return tooltipItems[0].dataset.label;
           },
           label: (tooltipItems) => {
-            return `Fold - ${tooltipItems.label} : ${(tooltipItems.dataset.data[tooltipItems.dataIndex]).toFixed(2)}%`;
+            return `Fold - ${tooltipItems.label} : ${tooltipItems.dataset.data[
+              tooltipItems.dataIndex
+            ].toFixed(2)}%`;
           },
         },
       },
@@ -123,7 +125,11 @@ pieChart = new Chart(ctx, {
     labels: ["Negative", "Netral", "Positive"],
     datasets: [
       {
-        data: [1, 2, 3],
+        data: [
+          best_fold["count"][2],
+          best_fold["count"][1],
+          best_fold["count"][0],
+        ],
         borderWidth: 1,
         borderColor: "#D3D3D3",
         backgroundColor: ["#9BD0F5", "#FFB1C1", "#77DD77"],
@@ -174,23 +180,25 @@ pieChart = new Chart(ctx, {
             return tooltipItems[0].dataset.label;
           },
           label: (tooltipItems) => {
-            return `Fold - ${tooltipItems.label} : ${(
-              tooltipItems.dataset.data[tooltipItems.dataIndex] * 100
-            ).toFixed(2)}%`;
+            let total = tooltipItems.dataset.data.reduce(
+              (arr, curr) => arr + curr
+            );
+            return `Jumlah - ${
+              tooltipItems.dataset.data[tooltipItems.dataIndex]
+            } (${(
+              (tooltipItems.dataset.data[tooltipItems.dataIndex] / total) *
+              100
+            ).toFixed(2)}%)`;
           },
         },
       },
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-        },
+        display: false,
       },
       y: {
-        grid: {
-          display: false,
-        },
+        display: false,
       },
     },
   },

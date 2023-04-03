@@ -192,9 +192,6 @@ def trainModel(calculate_features, labels):
         confusion_matrix = numpy.fliplr(confusion_matrix)
         score_cm = metrics.classification_report(y_test, y_predict, zero_division=0, output_dict=True)
         accuracy = metrics.accuracy_score(y_test, y_predict)
-        cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
-        # cm_display.plot()
-        # plt.show()
 
         if best_fold['f1'] < score_cm['macro avg']['f1-score']:
             best_fold['fold'] = i
@@ -208,6 +205,10 @@ def trainModel(calculate_features, labels):
             best_fold['count'] = [countPositive, countNetral, countNegative]
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
+            
+            cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
+            cm_display.plot()
+            plt.savefig('TrainData/TrainPlot.png')
 
         temp_fold['fold'] = i
         temp_fold['accuracy'] = accuracy
