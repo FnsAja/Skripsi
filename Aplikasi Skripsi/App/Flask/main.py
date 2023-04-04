@@ -8,7 +8,7 @@ from tweet import insertToExcel
 from preprocessing import startTrain
 from predict import startPredict
 
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = 'df0331cefc6c2b9a5d0208a726a5d1c0fd37324feba25506'
 pesan = {}
 
@@ -97,3 +97,8 @@ def save_excel_predict():
         download_name='DataPredict.xlsx',
         as_attachment=True
     )
+
+@app.route('/trainPlot')
+def save_trainPlot_image():
+    filename = './TrainData/TrainPlot.png'
+    return send_file(filename, mimetype='image/png')

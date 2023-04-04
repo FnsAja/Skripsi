@@ -15,19 +15,19 @@
   </form>
 
   {% if status == 'complete' %}
-  <a href="/saveFileTest">Download File Test</a>
+    <a href="/saveFileTest">Download File Test</a>
 
-  <div class="content">
-    <div style="position: relative; height:400px; width: 800px;">
-      <canvas id="barChart"></canvas>
+    <div class="content">
+      <div style="position: relative; height:400px; width: 800px;">
+        <canvas id="barChart"></canvas>
+      </div>
+      <div style="position: relative; height:400px; width: 400px;">
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div style="position: relative; height:400px; width: 400px;">
+        <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
+      </div>
     </div>
-    <div style="position: relative; height:400px; width: 400px;">
-      <canvas id="pieChart"></canvas>
-    </div>
-    <div style="position: relative; height:400px; width: 400px;">
-      <img src="{{ url_for('TrainData', filename='TrainPlot.png') }}">
-    </div>
-  </div>
   {% endif %}
 
   {% with messages = get_flashed_messages() %}

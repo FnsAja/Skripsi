@@ -6,12 +6,16 @@ import joblib
 import os
 import lib.tesaurus.tesaurus as ts
 import matplotlib.pyplot as plt
+import matplotlib
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn import svm, metrics
+from wordcloud import WordCloud
+
 
 def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
@@ -69,6 +73,7 @@ def preprocessing(features):
     list_slangwords = json.load(open('../../Function/lib/NLP_bahasa_resources/combined_slang_words.txt'))
     
     processed_features = []
+    words = ""
 
     for sentences in features:
         # Remove Special Character
@@ -110,13 +115,23 @@ def preprocessing(features):
         # Remove Multiple Word
         temporary = ' '.join(set(temporary.split()))
 
+        # Add To Word List
+        word = ''.join(temporary)
+        words += word
+            
         # Tambahkan kedalam list
         processed_features.append(temporary)
 
-        # print(f"Pre-Processing - {round(len(processed_features)/len(features)*100, 2)}%")
-    
-    return processed_features
-       
+    return processed_features, words
+
+def generateWordCloud(text):
+    wordcloud = WordCloud(width=500, height=500, max_font_size=80, max_words=100, background_color="black").generate(text)
+    matplotlib.use('agg')            
+    plt.figure()
+    plt.imshow(wordcloud, interpolation="None")
+    plt.axis("off")
+    plt.savefig("TrainData/TrainWordCloud.png")
+
 def weighting(processed_features):
     vectorizer = TfidfVectorizer()
     calculate_features = vectorizer.fit_transform(processed_features)
@@ -206,6 +221,7 @@ def trainModel(calculate_features, labels):
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
             
+            matplotlib.use('agg')
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
             cm_display.plot()
             plt.savefig('TrainData/TrainPlot.png')
@@ -234,7 +250,8 @@ def trainModel(calculate_features, labels):
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
-    processed_features = preprocessing(features=features)
+    processed_features, words = preprocessing(features=features)
+    generateWordCloud(words)
     calculate_features = weighting(processed_features=processed_features)
     best_fold, all_fold = trainModel(calculate_features=calculate_features, labels=labels)
 
