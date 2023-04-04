@@ -102,3 +102,8 @@ def save_excel_predict():
 def save_trainPlot_image():
     filename = './TrainData/TrainPlot.png'
     return send_file(filename, mimetype='image/png')
+
+@app.route('/trainWordcloud')
+def save_wordcloud_image():
+    filename = './TrainData/TrainWordCloud.png'
+    return send_file(filename, mimetype='image/png')

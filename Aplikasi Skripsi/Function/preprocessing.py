@@ -114,15 +114,11 @@ def preprocessing(features):
         
         # Remove Multiple Word
         temporary = ' '.join(set(temporary.split()))
-
-        # Add To Word List
-        word = ''.join(temporary)
-        words += word
             
         # Tambahkan kedalam list
         processed_features.append(temporary)
 
-    return processed_features, words
+    return processed_features
 
 def generateWordCloud(text):
     wordcloud = WordCloud(width=500, height=500, max_font_size=80, max_words=100, background_color="black").generate(text)
@@ -250,7 +246,7 @@ def trainModel(calculate_features, labels):
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
-    processed_features, words = preprocessing(features=features)
+    processed_features, positiveWords, netralWords, negativeWords = preprocessing(features=features)
     generateWordCloud(words)
     calculate_features = weighting(processed_features=processed_features)
     best_fold, all_fold = trainModel(calculate_features=calculate_features, labels=labels)
