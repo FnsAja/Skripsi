@@ -10,7 +10,6 @@ import matplotlib
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn import svm, metrics
@@ -73,7 +72,6 @@ def preprocessing(features):
     list_slangwords = json.load(open('../../Function/lib/NLP_bahasa_resources/combined_slang_words.txt'))
     
     processed_features = []
-    words = ""
 
     for sentences in features:
         # Remove Special Character
@@ -120,13 +118,18 @@ def preprocessing(features):
 
     return processed_features
 
-def generateWordCloud(text):
-    wordcloud = WordCloud(width=500, height=500, max_font_size=80, max_words=100, background_color="black").generate(text)
+def generateWordCloud(text, name, mode):
+    list_stopwords = stopwords.words('indonesian')
+    new_stopwords = open('../../Function/lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
+    list_stopwords.extend(new_stopwords)
+
+    wordcloud = WordCloud(max_words=50, background_color="black").generate(text)
     matplotlib.use('agg')            
     plt.figure()
-    plt.imshow(wordcloud, interpolation="None")
+    plt.imshow(wordcloud, interpolation="nearest")
     plt.axis("off")
-    plt.savefig("TrainData/TrainWordCloud.png")
+    plt.savefig(f"{mode}Data/{name + mode}WordCloud.png")
+    matplotlib.pyplot.close()
 
 def weighting(processed_features):
     vectorizer = TfidfVectorizer()
@@ -134,9 +137,12 @@ def weighting(processed_features):
     
     return calculate_features
 
-def trainModel(calculate_features, labels):
+def trainModel(calculate_features, labels, processed_features):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
+    positiveWords = ''
+    netralWords = ''
+    negativeWords = ''
     
     best_fold = {
         "f1": 0
@@ -174,11 +180,17 @@ def trainModel(calculate_features, labels):
             
             # Jumlah Positif, Negatif dan Netral
             if content == 0:
-                countNetral += 1            
+                countNetral += 1  
+                netralWord = processed_features[test_index[index]]
+                netralWords += ' ' + netralWord
             elif content == 1:
                 countPositive += 1            
+                positiveWord = processed_features[test_index[index]]
+                positiveWords += ' ' + positiveWord
             elif content == -1:
                 countNegative += 1
+                negativeWord = processed_features[test_index[index]]
+                negativeWords += ' ' + negativeWord
 
             # Jumlah True Positive, False Positive, True Netral, False Netral, True Negative, False Negative
             if content == 0:
@@ -221,6 +233,7 @@ def trainModel(calculate_features, labels):
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
             cm_display.plot()
             plt.savefig('TrainData/TrainPlot.png')
+            matplotlib.pyplot.close()
 
         temp_fold['fold'] = i
         temp_fold['accuracy'] = accuracy
@@ -242,14 +255,16 @@ def trainModel(calculate_features, labels):
     
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
     
-    return best_fold, all_fold
+    return best_fold, all_fold, positiveWords, netralWords, negativeWords
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
-    processed_features, positiveWords, netralWords, negativeWords = preprocessing(features=features)
-    generateWordCloud(words)
+    processed_features = preprocessing(features=features)
     calculate_features = weighting(processed_features=processed_features)
-    best_fold, all_fold = trainModel(calculate_features=calculate_features, labels=labels)
+    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=calculate_features, labels=labels, processed_features=processed_features)
+    generateWordCloud(positiveWords, "Positive", "Train")
+    generateWordCloud(netralWords, "Netral", "Train")
+    generateWordCloud(negativeWords, "Negative", "Train")
 
     return best_fold, all_fold
 

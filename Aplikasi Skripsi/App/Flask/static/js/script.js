@@ -148,14 +148,11 @@ pieChart = new Chart(ctx, {
       },
       title: {
         display: true,
-        text: "10 Fold Cross Validation Score",
+        text: "Sentiment Test",
       },
       subtitle: {
         display: true,
-        text: [
-          "Chart show the score of every fold from 10 Fold Cross Validation",
-          "Especially Precision, Recall, and F1-Score we use Macro Avg Cause of imbalance size of data per classes",
-        ],
+        text: "Chart show the score of every sentiment",
         color: "blue",
         font: {
           size: 12,

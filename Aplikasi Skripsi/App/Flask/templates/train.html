@@ -24,11 +24,17 @@
       <div style="position: relative; height:400px; width: 400px;">
         <canvas id="pieChart"></canvas>
       </div>
-      <div style="position: relative; height:400px; width: 400px;">
+      <div style="position: relative; height:400px; width: 400px; margin-bottom: 50px;">
         <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
       </div>
       <div style="position: relative; height:400px; width: 400px;">
-        <img src="{{ url_for('save_wordcloud_image') }}" alt="WordCloud Image">
+        <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
+      </div>
+      <div style="position: relative; height:400px; width: 400px;">
+        <img src="{{ url_for('save_wordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
+      </div>
+      <div style="position: relative; height:400px; width: 400px;">
+        <img src="{{ url_for('save_wordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
       </div>
     </div>
   {% endif %}

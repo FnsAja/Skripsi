@@ -70,7 +70,9 @@ def predict():
             
             status = 'complete'
             
-            data = startPredict('Model/svm.pkl', 'TestData/Test.xlsx')
+            positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = startPredict('Model/svm.pkl', 'TestData/Test.xlsx')
+            
+            return render_template('predict.html', status = status, data = json.dumps({positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative}))
     
     return render_template('predict.html', status = status)
 
@@ -103,7 +105,12 @@ def save_trainPlot_image():
     filename = './TrainData/TrainPlot.png'
     return send_file(filename, mimetype='image/png')
 
-@app.route('/trainWordcloud')
-def save_wordcloud_image():
-    filename = './TrainData/TrainWordCloud.png'
+@app.route('/trainWordcloud<name>')
+def save_wordcloud_image(name):
+    filename = f'./TrainData/{name}TrainWordCloud.png'
+    return send_file(filename, mimetype='image/png')
+
+@app.route('/predictWordcloud<name>')
+def save_predwordcloud_image(name):
+    filename = f'./TrainData/{name}TrainWordCloud.png'
     return send_file(filename, mimetype='image/png')
