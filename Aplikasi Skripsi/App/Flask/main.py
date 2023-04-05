@@ -72,7 +72,7 @@ def predict():
             
             positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = startPredict('Model/svm.pkl', 'TestData/Test.xlsx')
             
-            return render_template('predict.html', status = status, data = json.dumps({positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative}))
+            return render_template('predict.html', status = status, data = json.dumps({'positiveWords': positiveWords, 'netralWords': netralWords, 'negativeWords': negativeWords, 'countPositive': countPositive, 'countNetral': countNetral, 'countNegative': countNegative}))
     
     return render_template('predict.html', status = status)
 

@@ -44,8 +44,10 @@
     {% if status == 'complete' %}
     <script>
       let data = JSON.parse({{ data| tojson | safe }})
-      console.log(data)
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../static/js/predictScript.js"></script>
     {% endif %}
+
   </body>
 </html>

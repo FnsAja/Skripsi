@@ -1,8 +1,4 @@
-let label = [],
-  accuracy = [],
-  precision = [],
-  recall = [],
-  f1_score = [];
+let label = [], accuracy = [], precision = [], recall = [], f1_score = []
 
 for (let i in all_fold) {
   label.push(all_fold[i].fold);
