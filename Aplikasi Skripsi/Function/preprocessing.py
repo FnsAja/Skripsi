@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn import svm, metrics
 from wordcloud import WordCloud
-
+from sklearn.decomposition import PCA
 
 def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
@@ -229,12 +229,12 @@ def trainModel(calculate_features, labels, processed_features):
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
             
-            matplotlib.use('agg')
+            # matplotlib.use('agg')
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
             cm_display.plot()
             plt.savefig('TrainData/TrainPlot.png')
             matplotlib.pyplot.close()
-
+        
         temp_fold['fold'] = i
         temp_fold['accuracy'] = accuracy
         temp_fold['precision'] = score_cm['macro avg']['precision']
@@ -259,9 +259,10 @@ def trainModel(calculate_features, labels, processed_features):
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
-    processed_features = preprocessing(features=features)
-    calculate_features = weighting(processed_features=processed_features)
-    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=calculate_features, labels=labels, processed_features=processed_features)
+    df = pd.DataFrame({'corpus': features, 'target': labels})
+    df['cleaned'] = preprocessing(features=df['corpus'])
+    df['calculated'] = weighting(processed_features=df['cleaned']).shape[0]
+    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=df['calculated'], labels=df['target'], processed_features=df['cleaned'])
     generateWordCloud(positiveWords, "Positive", "Train")
     generateWordCloud(netralWords, "Netral", "Train")
     generateWordCloud(negativeWords, "Negative", "Train")

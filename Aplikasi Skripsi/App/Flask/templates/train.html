@@ -27,6 +27,9 @@
       <div style="position: relative; height:400px; width: 400px; margin-bottom: 50px;">
         <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
       </div>
+      <div style="position: relative; height:400px; width: 400px; margin-bottom: 50px;">
+        <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">
+      </div>
       <div style="position: relative; height:400px; width: 400px;">
         <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
       </div>
@@ -52,6 +55,7 @@
     let all_fold = JSON.parse({{ all_fold| tojson | safe }})
     let best_fold = JSON.parse({{ best_fold| tojson | safe }})
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../static/js/trainScript.js"></script>
   {% endif %}

@@ -105,6 +105,11 @@ def save_trainPlot_image():
     filename = './TrainData/TrainPlot.png'
     return send_file(filename, mimetype='image/png')
 
+@app.route('/trainChart')
+def save_trainChart_image():
+    filename = './TrainData/TrainChart.png'
+    return send_file(filename, mimetype='image/png')
+
 @app.route('/trainWordcloud<name>')
 def save_wordcloud_image(name):
     filename = f'./TrainData/{name}TrainWordCloud.png'
