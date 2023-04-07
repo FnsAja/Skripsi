@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn import svm, metrics
 from wordcloud import WordCloud
-from sklearn.decomposition import PCA
+from scipy import sparse
 
 def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
@@ -74,9 +74,13 @@ def preprocessing(features):
     processed_features = []
 
     for sentences in features:
-        # Remove Special Character
-        temporary = re.sub(r'\W', ' ', str(sentences))
 
+        # Remove Mention, links and Hastag
+        temporary = re.sub('http://\S+|https://\S+|@\S+|#\S+|##\S+', ' ', str(sentences))
+
+        # Remove Special Character
+        temporary = re.sub(r'\W', ' ', str(temporary))
+        
         # Remove Number
         temporary = re.sub(r'\d', ' ', temporary)
 
@@ -133,11 +137,11 @@ def generateWordCloud(text, name, mode):
 
 def weighting(processed_features):
     vectorizer = TfidfVectorizer()
-    calculate_features = vectorizer.fit_transform(processed_features)
-    
-    return calculate_features
+    calculate_features = vectorizer.fit(processed_features)
 
-def trainModel(calculate_features, labels, processed_features):
+    return calculate_features, vectorizer
+
+def trainModel(calculate_features, labels, processed_features, vectorizers):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     positiveWords = ''
@@ -152,15 +156,18 @@ def trainModel(calculate_features, labels, processed_features):
     temp_fold = {}
         
     i = 1
-    for train_index, test_index in kf.split(calculate_features, labels):
-        X_train = calculate_features[train_index]
+    for train_index, test_index in kf.split(processed_features, labels):
+        print(train_index)
+        X_train = calculate_features.transform(processed_features[train_index])
         y_train = labels[train_index]
-        X_test = calculate_features[test_index]
+        X_test = calculate_features.transform(processed_features[test_index])
         y_test = labels[test_index]
 
         # Train
         clf.fit(X_train, y_train)
         y_predict = clf.predict(X_test)
+
+        print(calculate_features.vocabulary_)
 
         countNetral = 0
         countPositive = 0
@@ -259,10 +266,9 @@ def trainModel(calculate_features, labels, processed_features):
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
-    df = pd.DataFrame({'corpus': features, 'target': labels})
-    df['cleaned'] = preprocessing(features=df['corpus'])
-    df['calculated'] = weighting(processed_features=df['cleaned']).shape[0]
-    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=df['calculated'], labels=df['target'], processed_features=df['cleaned'])
+    processed_features = preprocessing(features=features)
+    calculated_features, vectorizers = weighting(processed_features=processed_features)
+    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=calculated_features, labels=labels, processed_features=processed_features, vectorizers=vectorizers)
     generateWordCloud(positiveWords, "Positive", "Train")
     generateWordCloud(netralWords, "Netral", "Train")
     generateWordCloud(negativeWords, "Negative", "Train")

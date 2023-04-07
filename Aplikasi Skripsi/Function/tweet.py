@@ -13,7 +13,7 @@ def appendData(query):
     tweets = []
     for tweet in sntwitter.TwitterSearchScraper(query, maxEmptyPages=1000).get_items():
         print(tweet.date)
-        tweets.append([' ', re.sub('http://\S+|https://\S+|@\S+|#\S+|##\S+', '', str(tweet.rawContent))])
+        tweets.append([' ',str(tweet.rawContent)])
 
     return tweets
 
