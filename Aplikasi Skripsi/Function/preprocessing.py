@@ -10,11 +10,12 @@ import matplotlib
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import cross_val_score, KFold
 from sklearn import svm, metrics
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.model_selection import KFold
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
 from wordcloud import WordCloud
-from scipy import sparse
 
 def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
@@ -144,6 +145,7 @@ def weighting(processed_features):
 def trainModel(calculate_features, labels, processed_features, vectorizers):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
+    processed_features = numpy.array(processed_features)
     positiveWords = ''
     netralWords = ''
     negativeWords = ''
@@ -157,17 +159,42 @@ def trainModel(calculate_features, labels, processed_features, vectorizers):
         
     i = 1
     for train_index, test_index in kf.split(processed_features, labels):
-        print(train_index)
-        X_train = calculate_features.transform(processed_features[train_index])
-        y_train = labels[train_index]
-        X_test = calculate_features.transform(processed_features[test_index])
-        y_test = labels[test_index]
-
+        X_train, X_test = processed_features[train_index], processed_features[test_index]
+        y_train, y_test = labels[train_index], labels[test_index]
+        
+        X_train = vectorizers.fit_transform(X_train)
+        X_test = vectorizers.transform(X_test)
+        
         # Train
         clf.fit(X_train, y_train)
         y_predict = clf.predict(X_test)
-
-        print(calculate_features.vocabulary_)
+                
+        # pipeline = Pipeline([
+        #     ('vect', CountVectorizer()),
+        #     ('tfidf', TfidfVectorizer()),
+        # ])
+        # X = pipeline.fit_transform(processed_features[train_index]).todense()
+        
+        pca = PCA(n_components=2).fit(numpy.asarray(X_train.todense()))
+        data2D = pca.transform(numpy.asarray(X_train.todense()))
+        
+        x_min, x_max = data2D[:, 0].min() - 1, data2D[:, 0].max() + 1
+        y_min, y_max = data2D[:, 1].min() - 1, data2D[:, 1].max() + 1
+        xx, yy = numpy.meshgrid(numpy.arange(x_min, x_max, .2), numpy.arange(y_min, y_max, .2))
+        print(xx.shape, yy.shape)
+        
+        shape = list(xx.shape)
+        shape.pop(1)
+        shape.insert(1, -1)
+        shape = tuple(shape)
+        
+        # clf1.fit(data2D, y_train)
+        # Z = clf1.predict(numpy.c_[xx.ravel(), yy.ravel()])
+        # Z = Z.reshape(xx.shape)
+        Z = y_predict.reshape(shape)
+        plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)      
+        plt.scatter(data2D[:,0], data2D[:,1], c=labels[train_index], cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+        plt.savefig('TrainData/TrainChart.png')
 
         countNetral = 0
         countPositive = 0
@@ -236,7 +263,7 @@ def trainModel(calculate_features, labels, processed_features, vectorizers):
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
             
-            # matplotlib.use('agg')
+            matplotlib.use('agg')
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
             cm_display.plot()
             plt.savefig('TrainData/TrainPlot.png')
