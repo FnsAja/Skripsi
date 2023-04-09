@@ -13,8 +13,8 @@ from nltk.tokenize import word_tokenize
 from sklearn import svm, metrics
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import KFold
+from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
 from wordcloud import WordCloud
 
 def longWordRemoval(sentence):
@@ -136,15 +136,10 @@ def generateWordCloud(text, name, mode):
     plt.savefig(f"{mode}Data/{name + mode}WordCloud.png")
     matplotlib.pyplot.close()
 
-def weighting(processed_features):
-    vectorizer = TfidfVectorizer()
-    calculate_features = vectorizer.fit(processed_features)
-
-    return calculate_features, vectorizer
-
-def trainModel(calculate_features, labels, processed_features, vectorizers):
+def trainModel(labels, processed_features):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
+    vectorizers = TfidfVectorizer()
     processed_features = numpy.array(processed_features)
     positiveWords = ''
     netralWords = ''
@@ -168,33 +163,50 @@ def trainModel(calculate_features, labels, processed_features, vectorizers):
         # Train
         clf.fit(X_train, y_train)
         y_predict = clf.predict(X_test)
+                        
+        # Prepare Data
+        # pca = PCA(n_components=2)
+        # X_test_np = numpy.array(X_test.todense())
+        # timesTen = lambda x: x * 10
+        # X_test_np = timesTen(X_test_np)
+        
+        # pca.fit(X_test_np, y_test)
+        # data2D = pca.fit_transform(X_test_np, y_test)
+        # clf.fit(data2D, y_test)
+        
+        # x_min, x_max = data2D[:, 0].min() - 1, data2D[:, 0].max() + 1
+        # y_min, y_max = data2D[:, 1].min() - 1, data2D[:, 1].max() + 1
+        # xx, yy = numpy.meshgrid(numpy.arange(x_min, x_max, 0.02), numpy.arange(y_min, y_max, 0.02))
                 
-        # pipeline = Pipeline([
-        #     ('vect', CountVectorizer()),
-        #     ('tfidf', TfidfVectorizer()),
-        # ])
-        # X = pipeline.fit_transform(processed_features[train_index]).todense()
-        
-        pca = PCA(n_components=2).fit(numpy.asarray(X_train.todense()))
-        data2D = pca.transform(numpy.asarray(X_train.todense()))
-        
-        x_min, x_max = data2D[:, 0].min() - 1, data2D[:, 0].max() + 1
-        y_min, y_max = data2D[:, 1].min() - 1, data2D[:, 1].max() + 1
-        xx, yy = numpy.meshgrid(numpy.arange(x_min, x_max, .2), numpy.arange(y_min, y_max, .2))
-        print(xx.shape, yy.shape)
-        
-        shape = list(xx.shape)
-        shape.pop(1)
-        shape.insert(1, -1)
-        shape = tuple(shape)
-        
-        # clf1.fit(data2D, y_train)
-        # Z = clf1.predict(numpy.c_[xx.ravel(), yy.ravel()])
+        # Z = clf.predict(numpy.c_[xx.ravel(), yy.ravel()])
         # Z = Z.reshape(xx.shape)
-        Z = y_predict.reshape(shape)
-        plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)      
-        plt.scatter(data2D[:,0], data2D[:,1], c=labels[train_index], cmap=plt.cm.coolwarm, s=20, edgecolors='k')
-        plt.savefig('TrainData/TrainChart.png')
+        
+        # plt.subplot(3, 4, i)
+        # plt.subplots_adjust(wspace=0.4, hspace=0.4)
+        # plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.4)
+        # plt.scatter(data2D[y_test == 1, 0], data2D[y_test == 1, 1], c=y_test[y_test == 1], edgecolor="k")
+        # plt.scatter(data2D[y_test == 0, 0], data2D[y_test == 0, 1], c=y_test[y_test == -0], edgecolor="k")
+        # plt.scatter(data2D[y_test == -1, 0], data2D[y_test == -1, 1], c=y_test[y_test == -1], edgecolor="k")
+        # plt.axis([x_min, x_max, y_min, y_max])
+        # plt.savefig('TrainData/TrainChart.png')
+        # colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+        # markers = ('s', 'x', 'o', '^', 'v')
+        # for idx, cl in enumerate(numpy.unique(y_test)):
+        #     plt.scatter(x = data2D[y_test == cl, 0], y = data2D[y_test == cl, 1], alpha = 0.8, c = colors[idx], marker = markers[idx], label = cl)
+        #     plt.scatter(data2D[:, 0], data2D[:, 1], c=labels[test_index], marker='x', cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+        #     plt.savefig('TrainData/TrainChart.png')
+        
+        # Cara vivi
+        data2D = X_test[:2, :]
+        print(data2D)
+        xx, yy = numpy.meshgrid(numpy.linspace(data2D[:, 0].min(), data2D[:, 0].max()), numpy.linspace(data2D[:, 1].min(), data2D[:, 1].max()))
+        grid = numpy.vstack([xx.ravel(), yy.ravel()]).T
+        model = clf.fit(data2D[:, :2], y_test)
+        y_pred = numpy.reshape(model.predict(grid), xx.shape)        
+        display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)
+        display.plot()
+        display.ax_.scatter(data2D[:, 0], data2D[:, 1], c=y_test, edgecolors="black")
+        plt.savefig('TrainChart.png')
 
         countNetral = 0
         countPositive = 0
@@ -294,8 +306,7 @@ def trainModel(calculate_features, labels, processed_features, vectorizers):
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
     processed_features = preprocessing(features=features)
-    calculated_features, vectorizers = weighting(processed_features=processed_features)
-    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(calculate_features=calculated_features, labels=labels, processed_features=processed_features, vectorizers=vectorizers)
+    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(labels=labels, processed_features=processed_features)
     generateWordCloud(positiveWords, "Positive", "Train")
     generateWordCloud(netralWords, "Netral", "Train")
     generateWordCloud(negativeWords, "Negative", "Train")
