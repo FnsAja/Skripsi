@@ -205,28 +205,33 @@ def trainModel(labels, processed_features):
         rows, cols = X_test.nonzero()
         data = {"row": rows, "col": cols, "data": X_test.data}
         df = pd.DataFrame(data=data)
-        for i in range(0, rows.shape[0]):
-            print(df.loc[df['row'] == i].head(2))
-        
-        data2D = X_test[:2, :]
-        xx, yy = numpy.meshgrid(numpy.linspace(data2D[:, 0].min(), data2D[:, 0].max()), numpy.linspace(data2D[:, 1].min(), data2D[:, 1].max()))
-        grid = numpy.vstack([xx.ravel(), yy.ravel()]).T
-        model = clf.fit(data2D[:, :2], y_test)
-        y_pred = numpy.reshape(model.predict(grid), xx.shape)        
-        display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)
-        display.plot()
-        display.ax_.scatter(data2D[:, 0], data2D[:, 1], c=y_test, edgecolors="black")
-        plt.savefig('TrainChart.png')
+        result = pd.DataFrame()
+        rowLen = numpy.unique(rows)
+        for i in range(0, len(rowLen)):
+            df1 = pd.DataFrame({'X': [df.loc[df['row'] == i, 'data'].head(2).iloc[0]], 'Y': [df.loc[df['row'] == i, 'data'].head(2).iloc[1]]})
+            result = result.append(df1.values, ignore_index=True, index=i)
 
-        countNetral = 0
-        countPositive = 0
-        countNegative = 0
-
-        falsePositive = 0
-        falseNegative = 0
-        falseNetral = 0
-        truePositive = 0
-        trueNegative = 0
+        print(result)
+          
+        data2D = X_test[:2, :]  
+        xx, yy = numpy.meshgrid(numpy.linspace(data2D[:, 0].min(), data2D[:, 0].max()), numpy.linspace(data2D[:, 1].min(), data2D[:, 1].max()))  
+        grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  
+        model = clf.fit(data2D[:, :2], y_test)  
+        y_pred = numpy.reshape(model.predict(grid), xx.shape)          
+        display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)  
+        display.plot()  
+        display.ax_.scatter(data2D[:, 0], data2D[:, 1], c=y_test, edgecolors="black")  
+        plt.savefig('TrainChart.png')  
+  
+        countNetral = 0  
+        countPositive = 0  
+        countNegative = 0  
+  
+        falsePositive = 0  
+        falseNegative = 0  
+        falseNetral = 0  
+        truePositive = 0  
+        trueNegative = 0  
         trueNetral = 0
 
         for index, content in enumerate(y_predict):
