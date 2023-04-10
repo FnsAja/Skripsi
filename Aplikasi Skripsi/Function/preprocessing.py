@@ -202,24 +202,7 @@ def trainModel(labels, processed_features):
         #     plt.savefig('TrainData/TrainChart.png')
         
         # Cara vivi
-        rows, cols = X_test.nonzero()
-        data = {"row": rows, "col": cols, "data": X_test.data}
-        df = pd.DataFrame(data=data)
-        result = pd.DataFrame()
-        rowLen = numpy.unique(rows)
-        for i in range(0, len(rowLen)):
-            df1 = pd.DataFrame({'X': [df.loc[df['row'] == i, 'data'].head(2).iloc[0]], 'Y': [df.loc[df['row'] == i, 'data'].head(2).iloc[1]]})
-            result = result.append(list(df1.values), ignore_index=True)
-  
-        xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min(), result[:, 0].max()), numpy.linspace(result[:, 1].min(), result[:, 1].max()))  
-        grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  
-        model = clf.fit(result[:, :2], y_test)  
-        y_pred = numpy.reshape(model.predict(grid), xx.shape)          
-        display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)  
-        display.plot()  
-        display.ax_.scatter(result[:, 0], result[:, 1], c=y_test, edgecolors="black")  
-        plt.savefig('TrainChart.png')  
-  
+          
         countNetral = 0  
         countPositive = 0  
         countNegative = 0  
@@ -286,8 +269,39 @@ def trainModel(labels, processed_features):
             best_fold['count'] = [countPositive, countNetral, countNegative]
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
+            best_fold['x_test'] = X_test
+            best_fold['y_test'] = y_test
             
             matplotlib.use('agg')
+            # rows, cols = best_fold['x_test'].nonzero()
+            # data = {"row": rows, "col": cols, "data": best_fold['x_test'].data}
+            # df = pd.DataFrame(data=data)
+            # result = pd.DataFrame()
+            # rowLen = numpy.unique(rows)
+            # for i in range(0, len(rowLen)):
+            #     df1 = pd.DataFrame({'X': [df.loc[df['row'] == i, 'data'].head(2).iloc[0]], 'Y': [df.loc[df['row'] == i, 'data'].head(2).iloc[1]]})
+            #     result = result.append(list(df1.values), ignore_index=True)
+            
+            # result = result.to_numpy()
+            # timesTen = lambda x: x * 100
+            # result = timesTen(result)
+            
+            pca = PCA(n_components=2)
+            X_test_np = numpy.array(best_fold['x_test'].todense())
+            timesTen = lambda x: x * 10
+            X_test_np = timesTen(X_test_np)
+            pca.fit(X_test_np, y_test)
+            result = pca.fit_transform(X_test_np, y_test)
+            
+            xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min(), result[:, 0].max()), numpy.linspace(result[:, 1].min(), result[:, 1].max()))  
+            grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  
+            model = clf.fit(result[:, :2], best_fold['y_test'])  
+            y_pred = numpy.reshape(model.predict(grid), xx.shape)          
+            display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)  
+            display.plot()  
+            display.ax_.scatter(result[:, 0], result[:, 1], c=best_fold['y_test'], edgecolors="black")  
+            plt.savefig('TrainData/TrainChart.png')
+            
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
             cm_display.plot()
             plt.savefig('TrainData/TrainPlot.png')
