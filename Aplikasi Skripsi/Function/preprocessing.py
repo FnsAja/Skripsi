@@ -15,6 +15,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import KFold
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
 from wordcloud import WordCloud
 
 def longWordRemoval(sentence):
@@ -140,15 +141,15 @@ def trainModel(labels, processed_features):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     vectorizers = TfidfVectorizer()
+    tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
+    
     positiveWords = ''
     netralWords = ''
     negativeWords = ''
-    
     best_fold = {
         "f1": 0
     }
-    
     all_fold = []
     temp_fold = {}
         
@@ -157,12 +158,16 @@ def trainModel(labels, processed_features):
         X_train, X_test = processed_features[train_index], processed_features[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
         
-        X_train = vectorizers.fit_transform(X_train)
+        tfIdf_svm.fit(X_train, y_train)
+        y_predict = tfIdf_svm.predict(X_test)
         X_test = vectorizers.transform(X_test)
         
+        # X_train = vectorizers.fit_transform(X_train)
+        # X_test = vectorizers.transform(X_test)
+        
         # Train
-        clf.fit(X_train, y_train)
-        y_predict = clf.predict(X_test)
+        # clf.fit(X_train, y_train)
+        # y_predict = clf.predict(X_test)
                         
         # Prepare Data
         # pca = PCA(n_components=2)
@@ -197,8 +202,13 @@ def trainModel(labels, processed_features):
         #     plt.savefig('TrainData/TrainChart.png')
         
         # Cara vivi
+        rows, cols = X_test.nonzero()
+        data = {"row": rows, "col": cols, "data": X_test.data}
+        df = pd.DataFrame(data=data)
+        for i in range(0, rows.shape[0]):
+            print(df.loc[df['row'] == i].head(2))
+        
         data2D = X_test[:2, :]
-        print(data2D)
         xx, yy = numpy.meshgrid(numpy.linspace(data2D[:, 0].min(), data2D[:, 0].max()), numpy.linspace(data2D[:, 1].min(), data2D[:, 1].max()))
         grid = numpy.vstack([xx.ravel(), yy.ravel()]).T
         model = clf.fit(data2D[:, :2], y_test)
