@@ -7,6 +7,7 @@ import os
 import lib.tesaurus.tesaurus as ts
 import matplotlib.pyplot as plt
 import matplotlib
+import statistics as st
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -273,9 +274,13 @@ def trainModel(labels, processed_features):
             best_fold['y_test'] = y_test
             
             matplotlib.use('agg')
-            # rows, cols = best_fold['x_test'].nonzero()
-            # data = {"row": rows, "col": cols, "data": best_fold['x_test'].data}
-            # df = pd.DataFrame(data=data)
+            rows, cols = best_fold['x_test'].nonzero()
+            data = {"row": rows, "col": cols, "data": best_fold['x_test'].data}
+            df = pd.DataFrame(data=data)
+            result = numpy.array()
+            for i in range(0, len(numpy.unique(rows))):
+                result = result.append(st.mean([df.loc[df['row'] == i, 'data'].iloc[0]]))
+            print(result)
             # result = pd.DataFrame()
             # rowLen = numpy.unique(rows)
             # for i in range(0, len(rowLen)):
