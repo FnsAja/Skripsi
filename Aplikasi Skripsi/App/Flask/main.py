@@ -89,8 +89,8 @@ def save_excel(name):
 @app.route('/saveFileTest')
 def save_excel_test():
     return send_file(
-        f'Process/DataTest.csv',
-        download_name='DataTest.csv',
+        f'Process/DataTest.xlsx',
+        download_name='DataTest.xlsx',
         as_attachment=True
     )
     

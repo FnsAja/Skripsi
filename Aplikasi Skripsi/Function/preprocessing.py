@@ -53,7 +53,7 @@ def prepareData(data_source_url):
     read_file = pd.read_excel(data_source_url)
     read_file.to_csv("Process/Data.csv", index=1, header=True)
     read_file = read_file.drop('Sentiment', axis=1)
-    read_file.to_csv("Process/DataTest.csv", index=1, header=True)
+    read_file.to_excel("Process/DataTest.xlsx", index=1, header=True)
     
     tweets = pd.read_csv("Process/Data.csv")
 
@@ -259,7 +259,7 @@ def trainModel(labels, processed_features):
 
         if best_fold['f1'] < score_cm['macro avg']['f1-score']:
             best_fold['fold'] = i
-            best_fold['clf'] = clf
+            best_fold['clf'] = tfIdf_svm
             best_fold['accuracy'] = accuracy
             best_fold['precision'] = score_cm['macro avg']['precision']
             best_fold['recall'] = score_cm['macro avg']['recall']
@@ -286,12 +286,13 @@ def trainModel(labels, processed_features):
             # timesTen = lambda x: x * 100
             # result = timesTen(result)
             
-            pca = PCA(n_components=2)
-            X_test_np = numpy.array(best_fold['x_test'].todense())
-            timesTen = lambda x: x * 10
-            X_test_np = timesTen(X_test_np)
-            pca.fit(X_test_np, y_test)
-            result = pca.fit_transform(X_test_np, y_test)
+            # pca = PCA(n_components=2)
+            # X_test_np = numpy.array(best_fold['x_test'].todense())
+            # timesTen = lambda x: x * 10
+            # X_test_np = timesTen(X_test_np)
+            # pca.fit(X_test_np, y_test)
+            # result = pca.fit_transform(X_test_np, y_test)
+            result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
             
             xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min(), result[:, 0].max()), numpy.linspace(result[:, 1].min(), result[:, 1].max()))  
             grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  

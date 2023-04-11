@@ -8,7 +8,7 @@ def loadModel(path):
     return clf
 
 def loadData(path):
-    tweets = pd.read_csv(path)
+    tweets = pd.read_excel(path, sheet_name="Sheet1")
     features = tweets.loc[:, 'Tweet'].values
     
     return features
@@ -41,13 +41,16 @@ def startPredict(pathModel, pathData):
     clf = loadModel(pathModel)
     features = loadData(pathData)
     processed_features = preprocessing.preprocessing(features=features)
-    calculated_features = preprocessing.weighting(processed_features)
-    result = clf.predict(calculated_features)
+    print(clf)
+    result = clf.predict(processed_features)
     positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = generateDataWordCloud(processed_features=processed_features, predict_result=result)
 
-    preprocessing.generateWordCloud(positiveWords, "Positive", "Test")
-    preprocessing.generateWordCloud(negativeWords, "Negative", "Test")
-    preprocessing.generateWordCloud(netralWords, "Netral", "Test")
+    if countPositive > 0:
+        preprocessing.generateWordCloud(positiveWords, "Positive", "Test")
+    if countNegative > 0:
+        preprocessing.generateWordCloud(negativeWords, "Negative", "Test")
+    if countNetral > 0:
+        preprocessing.generateWordCloud(netralWords, "Netral", "Test")
 
     data = {'Predict Result': result, 'Tweet': features}
 
