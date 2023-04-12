@@ -163,6 +163,16 @@ def trainModel(labels, processed_features):
         y_predict = tfIdf_svm.predict(X_test)
         X_test = vectorizers.transform(X_test)
         
+        rows, cols = X_test.nonzero()
+        data = {"row": rows, "col": cols, "data": X_test.data}
+        df = pd.DataFrame(data=data)
+        mean_list = []
+        for i in range(0, len(numpy.unique(rows))):
+            temp_list = df.loc[df['row'] == i, 'data'].values.tolist()
+            mean_list.append(sum(temp_list))
+
+        X_test_numpy = numpy.array(mean_list)
+
         # X_train = vectorizers.fit_transform(X_train)
         # X_test = vectorizers.transform(X_test)
         
@@ -270,17 +280,12 @@ def trainModel(labels, processed_features):
             best_fold['count'] = [countPositive, countNetral, countNegative]
             best_fold['true'] = [truePositive, trueNetral, trueNegative]
             best_fold['false'] = [falsePositive, falseNetral, falseNegative]
-            best_fold['x_test'] = X_test
+            best_fold['x_test'] = X_test_numpy
             best_fold['y_test'] = y_test
             
             matplotlib.use('agg')
-            rows, cols = best_fold['x_test'].nonzero()
-            data = {"row": rows, "col": cols, "data": best_fold['x_test'].data}
-            df = pd.DataFrame(data=data)
-            result = numpy.array()
-            for i in range(0, len(numpy.unique(rows))):
-                result = result.append(st.mean([df.loc[df['row'] == i, 'data'].iloc[0]]))
-            print(result)
+            
+
             # result = pd.DataFrame()
             # rowLen = numpy.unique(rows)
             # for i in range(0, len(rowLen)):
@@ -299,13 +304,18 @@ def trainModel(labels, processed_features):
             # result = pca.fit_transform(X_test_np, y_test)
             result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
             
-            xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min(), result[:, 0].max()), numpy.linspace(result[:, 1].min(), result[:, 1].max()))  
+            xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min() - 1, result[:, 0].max() + 1), numpy.linspace(result[:, 1].min() - 1, result[:, 1].max() + 1))  
             grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  
             model = clf.fit(result[:, :2], best_fold['y_test'])  
-            y_pred = numpy.reshape(model.predict(grid), xx.shape)          
+            y_pred = numpy.reshape(model.predict(grid), xx.shape)
             display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)  
-            display.plot()  
-            display.ax_.scatter(result[:, 0], result[:, 1], c=best_fold['y_test'], edgecolors="black")  
+            display.plot()
+            timesThree = lambda x: x + 3
+            display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], c=timesThree((best_fold['y_test'] == -1)), edgecolors="black")
+            display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], c=timesThree((best_fold['y_test'] == 0)), edgecolors="black")
+            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], c=timesThree((best_fold['y_test'] == 1), edgecolors="black")
+            plt.set_cmap("gist_rainbow")
+            plt.legend(loc="upper left")
             plt.savefig('TrainData/TrainChart.png')
             
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
