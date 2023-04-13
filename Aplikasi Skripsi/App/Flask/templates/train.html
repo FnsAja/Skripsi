@@ -18,6 +18,26 @@
     <a href="/saveFileTest">Download File Test</a>
 
     <div class="content">
+      <div style="position: relative; ">
+        <table id="table1" class="table table-striped">
+          <thead>
+            <th>
+              Word
+            </th>
+            <th>
+              DF Value
+            </th>
+          </thead>
+          <tbody>
+            {% for item in df_value %}
+            <tr>
+              <td>{{ item['word'] }}</td>
+              <td>{{ item['df'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
       <div style="position: relative; height:400px; width: 800px;">
         <canvas id="barChart"></canvas>
       </div>
@@ -27,7 +47,7 @@
       <div style="position: relative; height:400px; width: 400px; margin-bottom: 50px;">
         <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
       </div>
-      <div style="position: relative; height:400px; width: 1000px; margin-bottom: 50px;">
+      <div style="position: relative; height:500px; width: 500px; margin-bottom: 50px;">
         <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">
       </div>
       <div style="position: relative; height:400px; width: 400px;">
@@ -57,6 +77,8 @@
   </script>
 
   <script src="../static/js/chartJs.js"></script>
+  <script src="../static/js/jquery.min.js"></script>
+  <script src="../static/js/datatables.min.js"></script>
   <script src="../static/js/trainScript.js"></script>
   {% endif %}
 

@@ -41,7 +41,6 @@ def startPredict(pathModel, pathData):
     clf = loadModel(pathModel)
     features = loadData(pathData)
     processed_features = preprocessing.preprocessing(features=features)
-    print(clf)
     result = clf.predict(processed_features)
     positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = generateDataWordCloud(processed_features=processed_features, predict_result=result)
 

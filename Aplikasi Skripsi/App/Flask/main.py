@@ -47,12 +47,12 @@ def train():
 
             status = 'complete'
 
-            best_fold, all_fold = startTrain('TrainData/Train.xlsx')
+            best_fold, all_fold, df_value = startTrain('TrainData/Train.xlsx')
             best_fold.pop("clf")
             best_fold.pop("x_test")
             best_fold.pop("y_test")
 
-            return render_template('train.html', status = status, best_fold = json.dumps(best_fold), all_fold = json.dumps(all_fold))
+            return render_template('train.html', status = status, best_fold = json.dumps(best_fold), all_fold = json.dumps(all_fold), df_value = df_value)
         
     return render_template('train.html', status = status)
 

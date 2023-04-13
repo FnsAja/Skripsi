@@ -108,7 +108,7 @@ def preprocessing(features):
         # Remove Stop Words
         stopwords_result = [word for word in token_result if not word in list_stopwords]
         
-        # Remove Slang Words
+        # Change Slang Words
         slangwords_result = slangWordFilter(stopwords_result, list_slangwords)
         
         # Synonym Words
@@ -144,6 +144,7 @@ def trainModel(labels, processed_features):
     vectorizers = TfidfVectorizer()
     tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
+    all_tfidf = vectorizers.fit_transform(processed_features)
     
     positiveWords = ''
     netralWords = ''
@@ -161,7 +162,7 @@ def trainModel(labels, processed_features):
         
         tfIdf_svm.fit(X_train, y_train)
         y_predict = tfIdf_svm.predict(X_test)
-        X_test = vectorizers.transform(X_test)
+        X_test = tfIdf_svm.named_steps['tfidf'].transform(X_test)
         
         rows, cols = X_test.nonzero()
         data = {"row": rows, "col": cols, "data": X_test.data}
@@ -211,9 +212,7 @@ def trainModel(labels, processed_features):
         #     plt.scatter(x = data2D[y_test == cl, 0], y = data2D[y_test == cl, 1], alpha = 0.8, c = colors[idx], marker = markers[idx], label = cl)
         #     plt.scatter(data2D[:, 0], data2D[:, 1], c=labels[test_index], marker='x', cmap=plt.cm.coolwarm, s=20, edgecolors='k')
         #     plt.savefig('TrainData/TrainChart.png')
-        
-        # Cara vivi
-          
+                  
         countNetral = 0  
         countPositive = 0  
         countNegative = 0  
@@ -304,18 +303,12 @@ def trainModel(labels, processed_features):
             # result = pca.fit_transform(X_test_np, y_test)
             result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
             
-            xx, yy = numpy.meshgrid(numpy.linspace(result[:, 0].min() - 1, result[:, 0].max() + 1), numpy.linspace(result[:, 1].min() - 1, result[:, 1].max() + 1))  
-            grid = numpy.vstack([xx.ravel(), yy.ravel()]).T  
-            model = clf.fit(result[:, :2], best_fold['y_test'])  
-            y_pred = numpy.reshape(model.predict(grid), xx.shape)
-            display = DecisionBoundaryDisplay(xx0=xx, xx1=yy, response=y_pred)  
-            display.plot()
-            timesThree = lambda x: x + 3
-            display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], c=timesThree((best_fold['y_test'] == -1)), edgecolors="black")
-            display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], c=timesThree((best_fold['y_test'] == 0)), edgecolors="black")
-            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], c=timesThree((best_fold['y_test'] == 1), edgecolors="black")
-            plt.set_cmap("gist_rainbow")
-            plt.legend(loc="upper left")
+            model = clf.fit(result[:, :2], best_fold['y_test'])
+            display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
+            display.plot(plot_method="contourf", xlabel="lala", ylabel="lele")
+            display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
+            display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
+            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], edgecolors="black", marker='+')
             plt.savefig('TrainData/TrainChart.png')
             
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
@@ -343,16 +336,22 @@ def trainModel(labels, processed_features):
     
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
     
-    return best_fold, all_fold, positiveWords, netralWords, negativeWords
+    df_value = []
+    words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()
+    for index, word in enumerate(words_list):
+        df = numpy.sum(all_tfidf[:, index] > 0)
+        df_value.append({'word': word, 'df': df})
+    
+    return best_fold, all_fold, positiveWords, netralWords, negativeWords, df_value
 
 def startTrain(data_source_url):
     features, labels = prepareData(data_source_url=data_source_url)
     processed_features = preprocessing(features=features)
-    best_fold, all_fold, positiveWords, netralWords, negativeWords = trainModel(labels=labels, processed_features=processed_features)
+    best_fold, all_fold, positiveWords, netralWords, negativeWords, df_value = trainModel(labels=labels, processed_features=processed_features)
     generateWordCloud(positiveWords, "Positive", "Train")
     generateWordCloud(netralWords, "Netral", "Train")
     generateWordCloud(negativeWords, "Negative", "Train")
 
-    return best_fold, all_fold
+    return best_fold, all_fold, df_value
 
 
