@@ -2,10 +2,12 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 @layer base {
     body {
-        @apply bg-slate-300;
+        @apply bg-slate-100;
+        font-family: 'Inter', sans-serif;
     }   
 }
 
@@ -14,14 +16,6 @@
         @apply capitalize text-lg mx-2 my-3 text-center inline-block;
         font-family: 'Montserrat', sans-serif;
     }
-}
-
-.list {
-    @apply cursor-pointer hover:text-red-500;
-}
-
-.header {
-    font-family: 'Montserrat', sans-serif;
 }
 
 

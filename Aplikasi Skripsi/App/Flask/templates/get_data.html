@@ -2,31 +2,44 @@
     {% include "component/header.html" %}
 {% endwith %}
     <body>
+        <div class="navbar">
+            <div class="px-10 py-0 mb-10 bg-blue-100 border-2 border-b-orange-600">
+                <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/scrap">Scrap</a>
+                <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/train">Train</a>
+                <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/predict">Predict</a>
+            </div>
+        </div>
 
-        {% include "component/navbar.html" %}
+        <div class="content px-24 py-5">
+            <h2 class="normal-case text-2xl font-bold text-center pb-8">Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+            
+            <p class="normal-case text-lg mb-5">Masukan data : </p>
+    
+            <form action="/scrap" method="post">
+                <div class="form-input py-4 grid grid-flow-row grid-cols-4 gap-4 max-w-lg">
+                    <label for="name" class="col-span-2">Pilih Nama Calon Presiden &nbsp;</label>
+                    <select name="name" class="col-span-2">
+                        <option value="">Pilih Calon</option>
+                        <option value="Ganjar Pranowo">Ganjar Pranowo</option>
+                        <option value="Anies Baswedan">Anies Baswedan</option>
+                        <option value="Prabowo Subianto">Prabowo Subianto</option>
+                    </select>
+                    <label for="start" class="col-span-2">Masukan Tanggal Mulai &nbsp;&nbsp;</label>
+                    <input type="date" name="start" class="col-span-2">
+                    <label for="end" class="col-span-2">Masukan Tanggal Akhir &nbsp;&nbsp;</label>
+                    <input type="date" name="end" class="col-span-2">
+                    <input type="submit" class="btn hover:cursor-pointer bg-green-500 px-2 py-3 rounded-lg col-span-2 col-start-2 row-start-7">
+                </div>
+            </form>
+    
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
 
-        <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
-
-        <p>Klik tombol dibawah ini untuk mendownload file twitter capres</p>
-
-        <form action="/scrap" method="post">
-            <select name="name">
-                <option value="">Pilih Calon</option>
-                <option value="Ganjar Pranowo">Ganjar Pranowo</option>
-                <option value="Anies Baswedan">Anies Baswedan</option>
-                <option value="Prabowo Subianto">Prabowo Subianto</option>
-            </select>
-            <input type="date" name="start">
-            <input type="date" name="end">
-            <input type="submit">
-        </form>
-
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
     </body>
 </html>
