@@ -69,8 +69,8 @@ def preprocessing(features):
 
     list_stopwords = stopwords.words('indonesian')
 
-    new_stopwords = open('../../Function/lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
-    list_stopwords.extend(new_stopwords)
+    # new_stopwords = open('../../Function/lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
+    # list_stopwords.extend(new_stopwords)
 
     list_slangwords = json.load(open('../../Function/lib/NLP_bahasa_resources/combined_slang_words.txt'))
     
@@ -97,7 +97,7 @@ def preprocessing(features):
         temporary = temporary.lower()
 
         # Long Word Removal ex : aamiiinn => amin
-        temporary = longWordRemoval(temporary)
+        # temporary = longWordRemoval(temporary)
 
         # Stemming Bahasa Indonesia
         temporary = stemmer.stem(temporary)
