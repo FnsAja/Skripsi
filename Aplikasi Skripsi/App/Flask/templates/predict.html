@@ -22,7 +22,7 @@
       <input type="submit" disabled/>
     </form>
 
-    {% if status == 'complete' and data['positiveWords'] and data['netralWords'] and data['negativeWords']%}
+    {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
       <a href="/saveFilePredict">Download File Predict</a>
 
       <div class="content">
@@ -51,7 +51,7 @@
       {% endif %}
     {% endwith %}
       
-    {% if status == 'complete' and data['positiveWords'] and data['netralWords'] and data['negativeWords'] %}
+    {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
     <script>
         let data = JSON.parse({{ data| tojson | safe }})
     </script>
