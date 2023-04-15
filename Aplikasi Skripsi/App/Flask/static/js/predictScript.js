@@ -1,3 +1,14 @@
+$('input[name="radio"]').on('change',(e) => {
+  console.log(e.target.value)
+  if(e.target.value == 1){
+    $('#form-file :input').prop('disabled', false)
+    $('#form-text :input').prop('disabled', true)
+  }else{
+    $('#form-file :input').prop('disabled', true)
+    $('#form-text :input').prop('disabled', false)
+  }
+});
+
 let count = [data['countNegative'], data['countNetral'], data['countPositive']] ?? []
 
 ctx = document.getElementById("pieChart1");
@@ -82,3 +93,4 @@ pieChart1 = new Chart(ctx, {
     },
   },
 });
+

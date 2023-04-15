@@ -57,3 +57,13 @@ def startPredict(pathModel, pathData):
     df.to_excel('Process/DataPredict.xlsx')
 
     return positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative
+
+def startPredictt(pathModel, text: str):
+    clf = loadModel(pathModel)
+    processed_features = preprocessing.preprocessing(features=[text])
+    result = clf.predict(processed_features)
+    sentiment = ['Netral', 'Positive', 'Negative']
+    result = sentiment[result[0]]
+    
+    return processed_features, result
+    

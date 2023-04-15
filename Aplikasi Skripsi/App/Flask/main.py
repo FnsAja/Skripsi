@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import pandas as pd
 sys.path.append("D:\\Alfonso's Personal File\\Kuliah\\Skripsi\\Aplikasi Skripsi\\Function")
 
 from flask import Flask, render_template, request, flash, send_file, redirect, url_for
@@ -35,7 +36,7 @@ def scrap():
 def train():
     status = ''
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.files['file'] 
 
         if file.filename == '':
             flash('Please Input File')
@@ -57,11 +58,11 @@ def train():
     return render_template('train.html', status = status)
 
 @app.route('/predict', methods=('GET', 'POST'))
-def predict():
+def predict_file():
     status = ''
     if request.method == 'POST':
         file = request.files['file']
-        
+
         if file.filename == '':
             flash('Please Input File')
         else:
@@ -74,9 +75,31 @@ def predict():
             
             positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = startPredict('Model/svm.pkl', 'TestData/Test.xlsx')
             
+            print(positiveWords, negativeWords, netralWords)
+            print(countNegative, countNetral, countPositive)
+
             return render_template('predict.html', status = status, data = json.dumps({'positiveWords': positiveWords, 'netralWords': netralWords, 'negativeWords': negativeWords, 'countPositive': countPositive, 'countNetral': countNetral, 'countNegative': countNegative}))
     
     return render_template('predict.html', status = status)
+
+@app.route('/predictt', methods=['POST'])
+def predict_text():
+    status = ''
+    if request.method == 'POST':
+        text = request.form['text']
+
+        if text == '':
+            flash('Please Input Something')
+            return render_template('predict.html', status = status)
+        else:
+            status = 'complete'
+            
+            processed_features, result = startPredictt('Model/svm.pkl', text)
+            
+            return render_template('predict.html', status = status, data = {'processed_features': processed_features, 'result': result})
+    
+    return render_template('predict.html', status = status)
+
 
 @app.route('/saveFile/<name>')
 def save_excel(name):

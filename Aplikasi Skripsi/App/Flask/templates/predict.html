@@ -9,12 +9,20 @@
 
     <p>Masukan datatest</p>
 
-    <form action="/predict" method="post" enctype="multipart/form-data">
+    <label><input type="radio" value="1" name="radio" checked>Input File</label>
+    <label><input type="radio" value="2" name="radio">Input Text</label>
+    
+    <form action="/predict" id="form-file" method="post" enctype="multipart/form-data">
       <input type="file" name="file"/>
       <input type="submit"/>
     </form>
 
-    {% if status == 'complete' %}
+    <form action="/predictt" id="form-text" method="post">
+      <textarea name="text" cols="30" rows="10" disabled></textarea>
+      <input type="submit" disabled/>
+    </form>
+
+    {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
       <a href="/saveFilePredict">Download File Predict</a>
 
       <div class="content">
@@ -31,8 +39,10 @@
           <img src="{{ url_for('save_predwordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
         </div>
       </div>
+    {% elif status == 'complete' and data['result'] and data['processed_features'] %}
+      {{ data['processed_features'][0], data['result'] }}
     {% endif %}
-
+    
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
@@ -40,15 +50,16 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-
-    {% if status == 'complete' %}
+      
+    {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
     <script>
-      let data = JSON.parse({{ data| tojson | safe }})
+        let data = JSON.parse({{ data| tojson | safe }})
     </script>
+    {% endif %}
     
+    <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/chartJs.js"></script>
     <script src="../static/js/predictScript.js"></script>
-    {% endif %}
-
+      
   </body>
 </html>
