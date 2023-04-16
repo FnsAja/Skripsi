@@ -99,30 +99,30 @@ def preprocessing(features):
         # Long Word Removal ex : aamiiinn => amin
         # temporary = longWordRemoval(temporary)
 
-        # Stemming Bahasa Indonesia
-        temporary = stemmer.stem(temporary)
-
         # Tokenize
         token_result = word_tokenize(temporary)
         
-        # Remove Stop Words
-        stopwords_result = [word for word in token_result if not word in list_stopwords]
-        
         # Change Slang Words
-        slangwords_result = slangWordFilter(stopwords_result, list_slangwords)
+        slangwords_result = slangWordFilter(token_result, list_slangwords)
+        
+        # Remove Stop Words
+        stopwords_result = [word for word in slangwords_result if not word in list_stopwords]
         
         # Synonym Words
-        synonym = synonymWordFilter(slangwords_result)
+        synonym = synonymWordFilter(stopwords_result)
         
         # Back To String
         temporary = ' '.join(map(str, synonym))
         
+        # Stemming Bahasa Indonesia
+        temporary = stemmer.stem(temporary)
+        
         # Remove Multiple Word
-        temporary = ' '.join(set(temporary.split()))
+        # temporary = ' '.join(set(temporary.split()))
             
         # Tambahkan kedalam list
         processed_features.append(temporary)
-
+  
     return processed_features
 
 def generateWordCloud(text, name, mode):
