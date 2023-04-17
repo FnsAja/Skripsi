@@ -2,55 +2,58 @@
     {% include "component/header.html" %}
 {% endwith %}
     <body>
-        <div class="navbar">
+        {% include "component/navbar.html" %}
+        <!-- <div class="navbar">
             <div class="px-10 py-0 mb-10 bg-blue-100 border-2 border-b-orange-600">
                 <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/scrap">Scrap</a>
                 <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/train">Train</a>
                 <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/predict">Predict</a>
             </div>
-        </div>
+        </div> -->
         <div class="loading max-w-screen-lg mx-auto pb-10 flex justify-center" style="display: none;">
             <img src="../static/img/loading.gif" class="mx-auto rounded-full">
             <p class="absolute top-80 text-black font-bold">Mohon tunggu, data sedang diunduh...</p>
         </div>
         <div class="content px-24 py-5">
-            <h2 class="normal-case text-2xl font-bold text-center pb-8">Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+            <h2 class="normal-case text-2xl font-bold text-center pb-8">Halaman Get Data <br> Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
     
-            <div class="bg-white border-2 border-black rounded-md p-10 mr-64">
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <p class="text-red-700 text-lg font-bold mb-7">Error!! {{ message }}</p>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-
-                <p class="normal-case text-xl font-bold mb-5">Masukan data : </p>
-        
-                <form action="/scrap" method="post">
-                    <div class="form-input py-4 grid grid-flow-row grid-cols-6 gap-4 max-w-lg">
-                        <label for="name" class="col-span-3">Pilih Nama Calon Presiden &nbsp;</label>
-                        <select name="name" class="col-span-3 px-10">
-                            <option value="">Pilih Calon</option>
-                            <option value="Ganjar Pranowo">Ganjar Pranowo</option>
-                            <option value="Anies Baswedan">Anies Baswedan</option>
-                            <option value="Prabowo Subianto">Prabowo Subianto</option>
-                        </select>
-                        <label for="start" class="col-span-3">Masukan Tanggal Mulai &nbsp;&nbsp;</label>
-                        <input type="date" name="start" class="col-span-3 px-10">
-                        <label for="end" class="col-span-3">Masukan Tanggal Akhir &nbsp;&nbsp;</label>
-                        <input type="date" name="end" class="col-span-3 px-10">
-                        <button type="submit" onclick="loading()" class="btn hover:cursor-pointer bg-green-500 px-2 py-2 rounded-lg col-span-2 col-start-2 row-start-7">Scrap</button>
-                        {% if status == 'complete' %}
-                        <button onclick="location.href='/saveFile/{{ name }}'" type="button" class="btn hover:cursor-pointer bg-blue-500 px-2 py-3 rounded-lg col-span-2 col-start-4 row-start-7">Unduh disini</a>                            
+            <div class="bg-orange-100 border-2 border-black rounded-md mx-auto w-2/3 grid grid-cols-3">
+                <div class="left">
+                    <img src="../static/img/hero1.jpg" alt="Hero" class="h-full w-fit">
+                </div>
+                <div class="right m-10 col-span-2">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p class="text-red-700 text-lg font-bold mb-7">Error!! {{ message }}</p>
+                            {% endfor %}
                         {% endif %}
-                    </div>
-                </form>
+                    {% endwith %}
+                    <p class="normal-case text-xl font-bold mb-5">Masukan data : </p>        
+                    <form action="/scrap" method="post">
+                        <div class="form-input py-4 grid grid-flow-row grid-cols-6 gap-4 max-w-lg">
+                            <label for="name" class="col-span-3">Pilih Nama Calon Presiden &nbsp;</label>
+                            <select name="name" class="col-span-3 px-10 rounded-lg">
+                                <option value="">Pilih Calon</option>
+                                <option value="Ganjar Pranowo">Ganjar Pranowo</option>
+                                <option value="Anies Baswedan">Anies Baswedan</option>
+                                <option value="Prabowo Subianto">Prabowo Subianto</option>
+                            </select>
+                            <label for="start" class="col-span-3">Masukan Tanggal Mulai &nbsp;&nbsp;</label>
+                            <input type="date" name="start" class="col-span-3 px-10 rounded-lg">
+                            <label for="end" class="col-span-3">Masukan Tanggal Akhir &nbsp;&nbsp;</label>
+                            <input type="date" name="end" class="col-span-3 px-10 rounded-lg">
+                            <button type="submit" onclick="loading()" class="btn hover:cursor-pointer bg-green-500  font-bold px-2 py-2 rounded-lg col-span-2 col-start-2 row-start-7">Scrap</button>
+                            {% if status == 'complete' %}
+                            <button onclick="location.href='/saveFile/{{ name }}'" type="button" class="btn hover:cursor-pointer  font-bold bg-blue-400 px-2 py-3 rounded-lg col-span-2 col-start-4 row-start-7">Unduh disini</a>                            
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         <script src="../static/js/jquery.min.js"></script>
-        <script src="../static/js/scrapScript.js"></script> 
+        <script src="../static/js/loadingScript.js"></script> 
         {% if status == 'complete' %}
         <script>
             endLoading();

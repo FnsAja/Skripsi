@@ -29,7 +29,6 @@ def scrap():
         else:
             insertToExcel(name, start, end)
             return render_template('get_data.html', status = 'complete', name = name)
-            return redirect(url_for('save_excel', name = name))
         
     return render_template('get_data.html', pesan = pesan)
 
@@ -40,7 +39,10 @@ def train():
         file = request.files['file'] 
 
         if file.filename == '':
-            flash('Please Input File')
+            flash('File Tidak Boleh Kosong')
+        elif file.filename.split('.')[-1] != 'xlsx':
+            print(file.filename.split('.')[-1])
+            flash('Ekstensi File Tidak Sesuai')
         else:
             if not os.path.exists('TrainData'):
                 os.mkdir('TrainData')
@@ -101,10 +103,6 @@ def predict_text():
     
     return render_template('predict.html', status = status)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 01c477b263d2f51ee01897b28941df07e642534e
 @app.route('/saveFile/<name>')
 def save_excel(name):
     return send_file(

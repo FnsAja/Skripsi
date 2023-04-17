@@ -97,13 +97,7 @@ def preprocessing(features):
         temporary = temporary.lower()
 
         # Long Word Removal ex : aamiiinn => amin
-        # temporary = longWordRemoval(temporary)
-<<<<<<< HEAD
-
-        # Stemming Bahasa Indonesia
-        temporary = stemmer.stem(temporary)
-=======
->>>>>>> 01c477b263d2f51ee01897b28941df07e642534e
+        temporary = longWordRemoval(temporary)
 
         # Tokenize
         token_result = word_tokenize(temporary)
@@ -289,29 +283,11 @@ def trainModel(labels, processed_features):
             best_fold['y_test'] = y_test
             
             matplotlib.use('agg')
-            
-
-            # result = pd.DataFrame()
-            # rowLen = numpy.unique(rows)
-            # for i in range(0, len(rowLen)):
-            #     df1 = pd.DataFrame({'X': [df.loc[df['row'] == i, 'data'].head(2).iloc[0]], 'Y': [df.loc[df['row'] == i, 'data'].head(2).iloc[1]]})
-            #     result = result.append(list(df1.values), ignore_index=True)
-            
-            # result = result.to_numpy()
-            # timesTen = lambda x: x * 100
-            # result = timesTen(result)
-            
-            # pca = PCA(n_components=2)
-            # X_test_np = numpy.array(best_fold['x_test'].todense())
-            # timesTen = lambda x: x * 10
-            # X_test_np = timesTen(X_test_np)
-            # pca.fit(X_test_np, y_test)
-            # result = pca.fit_transform(X_test_np, y_test)
             result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
             
             model = clf.fit(result[:, :2], best_fold['y_test'])
             display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
-            display.plot(plot_method="contourf", xlabel="lala", ylabel="lele")
+            display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
             display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
             display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
             display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], edgecolors="black", marker='+')

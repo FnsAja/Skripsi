@@ -4,21 +4,40 @@
 
 <body>
   {% include "component/navbar.html" %}
+  <div class="loading max-w-screen-lg mx-auto pb-10 flex justify-center" style="display: none;">
+    <img src="../static/img/loading.gif" class="mx-auto rounded-full">
+    <p class="absolute top-80 text-black font-bold">Mohon tunggu, data sedang diproses...</p>
+  </div>
+  <div class="content px-24 py-5">
+    <h2 class="normal-case text-2xl font-bold text-center pb-8">Halaman Train Data <br> Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
 
-  <h2>Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
+    <div class="bg-orange-100 p-10 border-2 border-black rounded-md mx-auto w-2/3">
+      <p class="normal-case text-xl font-bold mb-2 flex justify-center">Masukan data yang telah dilabeling</p>
 
-  <p>Masukan data yang telah dilabeling</p>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="text-red-700 text-lg font-bold mb-7">Error!! {{ message }}</p>
+            {% endfor %}
+        {% endif %}
+      {% endwith %}
+      
+      <form action="/train" method="post" enctype="multipart/form-data">
+        <div class="form-input py-4">
+          <input type="file" name="file" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+          <button type="submit" onclick="loading()" class="btn hover:cursor-pointer font-bold bg-violet-400 px-2 py-2 mt-4 rounded-lg w-52">Train Model</button>
+          {% if status == 'complete' %}
+          <button onclick="location.href='/saveFileTest'" type="button" class="btn hover:cursor-pointer  font-bold bg-blue-400 px-2 py-2 rounded-lg">Unduh File Test disini</a>                            
+          {% endif %}
+          {% if status != 'complete' %}
+          <p class="normal-case text-md text-grey mt-10 flex justify-start">*Note Data harus dalam bentuk Excel!</p>
+          {% endif %}
+        </div>
+      </form>
 
-  <form action="/train" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" />
-    <input type="submit" />
-  </form>
-
-  {% if status == 'complete' %}
-    <a href="/saveFileTest">Download File Test</a>
-
-    <div class="content">
-      <div style="position: relative; ">
+      {% if status == 'complete' %}
+      <div class="df_table relative bg-white rounded-lg p-4">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Tabel DF</p>
         <table id="table1" class="table table-striped">
           <thead>
             <th>
@@ -38,37 +57,33 @@
           </tbody>
         </table>
       </div>
-      <div style="position: relative; height:400px; width: 800px;">
+      <div class="kfold_chart relative">
         <canvas id="barChart"></canvas>
       </div>
-      <div style="position: relative; height:400px; width: 400px;">
+      <div class="bestfold_chart" style="position: relative; height:400px; width: 400px;">
         <canvas id="pieChart"></canvas>
       </div>
-      <div style="position: relative; height:400px; width: 400px; margin-bottom: 50px;">
+      <div class="confusion_matrix relative mb-[50]px">
         <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
       </div>
-      <div style="position: relative; height:500px; width: 500px; margin-bottom: 50px;">
+      <div class="hyperplane_plot relative mb-[50]px">
         <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">
       </div>
-      <div style="position: relative; height:400px; width: 400px;">
+      <div class="positive_wordcloud relative">
         <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
       </div>
-      <div style="position: relative; height:400px; width: 400px;">
+      <div class="netral_wordcloud relative">
         <img src="{{ url_for('save_wordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
       </div>
-      <div style="position: relative; height:400px; width: 400px;">
+      <div class="negative_wordcloud relative">
         <img src="{{ url_for('save_wordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
-      </div>
+      </div>        
     </div>
+  </div>
   {% endif %}
-
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-        {{ message }}
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+  
+  <script src="../static/js/jquery.min.js"></script>
+  <script src="../static/js/loadingScript.js"></script>
 
   {% if status == 'complete' %}
   <script>
@@ -77,10 +92,10 @@
   </script>
 
   <script src="../static/js/chartJs.js"></script>
-  <script src="../static/js/jquery.min.js"></script>
   <script src="../static/js/datatables.min.js"></script>
   <script src="../static/js/trainScript.js"></script>
   {% endif %}
+  
 
 </body>
 
