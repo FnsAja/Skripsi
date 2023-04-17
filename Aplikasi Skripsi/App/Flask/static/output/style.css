@@ -626,16 +626,16 @@ a{
   display: grid;
 }
 
+.h-96{
+  height: 24rem;
+}
+
 .h-full{
   height: 100%;
 }
 
-.h-\[400\]{
-  height: 400;
-}
-
-.h-96{
-  height: 24rem;
+.max-h-full{
+  max-height: 100%;
 }
 
 .w-2\/3{
@@ -653,10 +653,6 @@ a{
 
 .w-full{
   width: 100%;
-}
-
-.w-\[400\]{
-  width: 400;
 }
 
 .max-w-lg{
