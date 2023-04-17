@@ -60,7 +60,6 @@ bila
 bisa
 boleh
 bolehlah
-bukan
 bukanlah
 bulan
 cara
@@ -413,7 +412,6 @@ itu
 itulah
 ingin
 inginkan
-jangan
 kalau
 kali
 kamu

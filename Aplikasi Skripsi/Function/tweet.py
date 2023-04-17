@@ -12,7 +12,6 @@ def query(name, start_date, end_date):
 def appendData(query):
     tweets = []
     for tweet in sntwitter.TwitterSearchScraper(query, maxEmptyPages=1000).get_items():
-        print(tweet.date)
         tweets.append([' ',str(tweet.rawContent)])
 
     return tweets
@@ -27,13 +26,5 @@ def insertToExcel(name, start_date, end_date):
     
     if os.path.exists(f"Data/output_{name}.xlsx"):
         os.remove(f"Data/output_{name}.xlsx")
-
-    # if os.path.exists(f"Data/output_{name}_DataTest.xlsx"):
-    #     os.remove(f"Data/output_{name}_DataTest.xlsx")
         
     df.to_excel(f"Data/output_{name}.xlsx")
-    # df1.to_excel(f"Data/output_{name}_DataTest.xlsx")
-
-    # with ZipFile(f'Data/Data_{name}.zip', 'w') as zipFile:
-    #     zipFile.write(f'Data/output_{name}.xlsx')
-    #     zipFile.write(f'Data/output_{name}_DataTest.xlsx')

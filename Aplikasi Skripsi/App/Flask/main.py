@@ -7,7 +7,7 @@ sys.path.append("D:\\Alfonso's Personal File\\Kuliah\\Skripsi\\Aplikasi Skripsi\
 from flask import Flask, render_template, request, flash, send_file, redirect, url_for
 from tweet import insertToExcel
 from preprocessing import startTrain
-from predict import startPredict
+from predict import startPredict, startPredictt
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = 'df0331cefc6c2b9a5d0208a726a5d1c0fd37324feba25506'
@@ -28,6 +28,7 @@ def scrap():
             flash('Pilihan tidak boleh kosong')
         else:
             insertToExcel(name, start, end)
+            return render_template('get_data.html', status = 'complete', name = name)
             return redirect(url_for('save_excel', name = name))
         
     return render_template('get_data.html', pesan = pesan)
@@ -100,7 +101,10 @@ def predict_text():
     
     return render_template('predict.html', status = status)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 01c477b263d2f51ee01897b28941df07e642534e
 @app.route('/saveFile/<name>')
 def save_excel(name):
     return send_file(
