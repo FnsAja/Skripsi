@@ -139,8 +139,8 @@ def generateWordCloud(text, name, mode):
     matplotlib.pyplot.close()
 
 def trainModel(labels, processed_features):
-    clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
+    clf = svm.SVC(kernel="rbf")
     vectorizers = TfidfVectorizer(max_features=2000, max_df=0.8)
     tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
@@ -223,7 +223,7 @@ def trainModel(labels, processed_features):
         truePositive = 0  
         trueNegative = 0  
         trueNetral = 0
-
+            
         for index, content in enumerate(y_predict):
             # Prediksi Salah
             # if content != labels[test_index][index]:        
@@ -284,7 +284,6 @@ def trainModel(labels, processed_features):
             
             matplotlib.use('agg')
             result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
-            
             model = clf.fit(result[:, :2], best_fold['y_test'])
             display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
             display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
@@ -315,7 +314,7 @@ def trainModel(labels, processed_features):
         
     if not os.path.exists('Model'):
         os.mkdir('Model')
-    
+        
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
     
     df_value = []
