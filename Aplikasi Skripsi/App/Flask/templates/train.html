@@ -26,9 +26,9 @@
         <div class="form-input py-4">
           <input type="file" name="file" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
           <button type="submit" onclick="loading()" class="btn hover:cursor-pointer font-bold bg-violet-400 px-2 py-2 mt-4 rounded-lg w-52">Train Model</button>
-          {% if status == 'complete' %}
-          <button onclick="location.href='/saveFileTest'" type="button" class="btn hover:cursor-pointer  font-bold bg-blue-400 px-2 py-2 rounded-lg">Unduh File Test disini</a>                            
-          {% endif %}
+          <!-- {% if status == 'complete' %}
+          <button onclick="location.href='/saveFileTest'" type="button" class="btn hover:cursor-pointer font-bold bg-blue-400 px-2 py-2 rounded-lg">Unduh File Test disini</a>                            
+          {% endif %} -->
           {% if status != 'complete' %}
           <p class="normal-case text-md text-grey mt-10 flex justify-start">*Note Data harus dalam bentuk Excel!</p>
           {% endif %}
@@ -57,26 +57,47 @@
           </tbody>
         </table>
       </div>
-      <div class="kfold_chart relative bg-white rounded-lg my-3 p-4 h-96">
-        <canvas id="barChart"></canvas>
+      <div class="kfold_chart relative bg-white rounded-lg my-3 p-4 ">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Fold Score</p>
+        <div class="chart-container h-96">
+          <canvas id="barChart"></canvas>
+        </div>
       </div>
       <div class="bestfold_chart bg-white rounded-lg my-3 p-4 w-full">
-        <canvas id="pieChart"></canvas>
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Chart Predict Data</p>
+        <div class="chart-container h-96">
+          <canvas id="pieChart"></canvas>
+        </div>
       </div>
       <div class="confusion_matrix relative bg-white rounded-lg my-3 p-4 w-full">
-        <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Confusion Matrix</p>
+        <div class="flex justify-center">
+          <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
+        </div>
       </div>
       <div class="hyperplane_plot relative bg-white rounded-lg my-3 p-4 w-full">
-        <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">SVM Area</p>
+        <div class="flex justify-center">
+          <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">        
+        </div>
       </div>
-      <div class="positive_wordcloud relative">
-        <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
+      <div class="positive_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Positive Word</p>
+        <div class="flex justify-center">
+          <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
+        </div>
       </div>
-      <div class="netral_wordcloud relative">
-        <img src="{{ url_for('save_wordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
+      <div class="netral_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Netral Word</p>
+        <div class="flex justify-center">
+          <img src="{{ url_for('save_wordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
+        </div>
       </div>
-      <div class="negative_wordcloud relative">
-        <img src="{{ url_for('save_wordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
+      <div class="negative_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
+        <p class="normal-case text-xl font-bold mb-2 flex justify-center">Negative Word</p>
+        <div class="flex justify-center">
+          <img src="{{ url_for('save_wordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
+        </div>
       </div>        
     </div>
   </div>
@@ -89,6 +110,7 @@
   <script>
     let all_fold = JSON.parse({{ all_fold| tojson | safe }})
     let best_fold = JSON.parse({{ best_fold| tojson | safe }})
+    endLoading();
   </script>
 
   <script src="../static/js/chartJs.js"></script>

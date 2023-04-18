@@ -12,14 +12,14 @@ def query(name, start_date, end_date):
 def appendData(query):
     tweets = []
     for tweet in sntwitter.TwitterSearchScraper(query, maxEmptyPages=1000).get_items():
-        tweets.append([' ',str(tweet.rawContent)])
+        tweets.append([tweet.date, ' ',str(tweet.rawContent)])
 
     return tweets
 
 def insertToExcel(name, start_date, end_date):
     tweets = query(name, start_date, end_date)
     
-    df = pd.DataFrame(tweets, columns=['Sentiment', 'Tweet']).drop_duplicates(subset='Tweet')
+    df = pd.DataFrame(tweets, columns=['Date', 'Sentiment', 'Tweet']).drop_duplicates(subset='Tweet')
     
     if not os.path.exists("Data"):
         os.makedirs("Data")

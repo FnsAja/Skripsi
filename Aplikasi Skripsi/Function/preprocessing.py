@@ -130,9 +130,9 @@ def generateWordCloud(text, name, mode):
     new_stopwords = open('../../Function/lib/NLP_bahasa_resources/combined_stop_words.txt').read().split("\n")
     list_stopwords.extend(new_stopwords)
 
-    wordcloud = WordCloud(max_words=50, background_color="black").generate(text)
+    wordcloud = WordCloud(max_words=100, height=400, width=800, background_color="black").generate(text)
     matplotlib.use('agg')            
-    plt.figure()
+    plt.figure(figsize=(20,10), facecolor='k')
     plt.imshow(wordcloud, interpolation="nearest")
     plt.axis("off")
     plt.savefig(f"{mode}Data/{name + mode}WordCloud.png")
@@ -141,7 +141,7 @@ def generateWordCloud(text, name, mode):
 def trainModel(labels, processed_features):
     clf = svm.SVC(kernel="rbf")
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
-    vectorizers = TfidfVectorizer()
+    vectorizers = TfidfVectorizer(max_features=2000, max_df=0.8)
     tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
     all_tfidf = vectorizers.fit_transform(processed_features)

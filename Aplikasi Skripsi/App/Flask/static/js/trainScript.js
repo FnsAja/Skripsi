@@ -200,5 +200,6 @@ pieChart = new Chart(ctx, {
 let table = new DataTable('#table1', {
   "bPaginate": true,
   "bFilter": true,
-  "bLengthChange": false
+  "bLengthChange": false,
+  "order": [[1, "desc"]]
 });

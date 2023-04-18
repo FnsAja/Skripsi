@@ -67,7 +67,10 @@ def predict_file():
         file = request.files['file']
 
         if file.filename == '':
-            flash('Please Input File')
+            flash('File Tidak Boleh Kosong')
+        elif file.filename.split('.')[-1] != 'xlsx':
+            print(file.filename.split('.')[-1])
+            flash('Ekstensi File Tidak Sesuai')
         else:
             if not os.path.exists('TestData'):
                 os.mkdir('TestData')

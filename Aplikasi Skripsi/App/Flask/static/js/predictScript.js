@@ -3,9 +3,13 @@ $('input[name="radio"]').on('change',(e) => {
   if(e.target.value == 1){
     $('#form-file :input').prop('disabled', false)
     $('#form-text :input').prop('disabled', true)
+    $('.form-file').show()
+    $('.form-text').hide()
   }else{
     $('#form-file :input').prop('disabled', true)
     $('#form-text :input').prop('disabled', false)
+    $('.form-file').hide()
+    $('.form-text').show()
   }
 });
 
