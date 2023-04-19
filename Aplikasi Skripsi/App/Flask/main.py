@@ -147,5 +147,5 @@ def save_wordcloud_image(name):
 
 @app.route('/predictWordcloud<name>')
 def save_predwordcloud_image(name):
-    filename = f'./TrainData/{name}TrainWordCloud.png'
+    filename = f'./TestData/{name}TestWordCloud.png'
     return send_file(filename, mimetype='image/png')

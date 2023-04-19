@@ -138,10 +138,14 @@ def generateWordCloud(text, name, mode):
     plt.savefig(f"{mode}Data/{name + mode}WordCloud.png")
     matplotlib.pyplot.close()
 
+def getF1(fold):
+    print(fold.get('macro avg'))
+    return fold['macro avg']['f1-score']
+
 def trainModel(labels, processed_features):
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     clf = svm.SVC(kernel="rbf")
-    vectorizers = TfidfVectorizer(max_features=2000, max_df=0.8)
+    vectorizers = TfidfVectorizer()
     tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
     all_tfidf = vectorizers.fit_transform(processed_features)
@@ -168,8 +172,8 @@ def trainModel(labels, processed_features):
         data = {"row": rows, "col": cols, "data": X_test.data}
         df = pd.DataFrame(data=data)
         mean_list = []
-        for i in range(0, len(numpy.unique(rows))):
-            temp_list = df.loc[df['row'] == i, 'data'].values.tolist()
+        for j in range(0, len(numpy.unique(rows))):
+            temp_list = df.loc[df['row'] == j, 'data'].values.tolist()
             mean_list.append(sum(temp_list))
 
         X_test_numpy = numpy.array(mean_list)
@@ -289,7 +293,7 @@ def trainModel(labels, processed_features):
             display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
             display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
             display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
-            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], edgecolors="black", marker='+')
+            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], marker='+')
             plt.savefig('TrainData/TrainChart.png')
             
             cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
@@ -316,6 +320,11 @@ def trainModel(labels, processed_features):
         os.mkdir('Model')
         
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
+
+    for k in all_fold:
+        print(type(all_fold))
+        print(type(k))
+        
     
     df_value = []
     words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()
