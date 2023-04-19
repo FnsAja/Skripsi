@@ -138,10 +138,6 @@ def generateWordCloud(text, name, mode):
     plt.savefig(f"{mode}Data/{name + mode}WordCloud.png")
     matplotlib.pyplot.close()
 
-def getF1(fold):
-    print(fold.get('macro avg'))
-    return fold['macro avg']['f1-score']
-
 def trainModel(labels, processed_features):
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     clf = svm.SVC(kernel="rbf")
@@ -321,11 +317,10 @@ def trainModel(labels, processed_features):
         
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
 
-    for k in all_fold:
-        print(type(all_fold))
-        print(type(k))
+    sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
+    for index, fold in enumerate(sorted_fold):
+        print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
         
-    
     df_value = []
     words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()
     for index, word in enumerate(words_list):

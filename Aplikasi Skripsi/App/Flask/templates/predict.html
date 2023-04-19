@@ -67,24 +67,30 @@
               <canvas id="pieChart1"></canvas>
             </div>
           </div>
+          {% if countPositive > 0 %}
           <div class="positive_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
             <p class="normal-case text-xl font-bold mb-2 flex justify-center">Positive Word</p>
             <div class="flex justify-center">
               <img src="{{ url_for('save_predwordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
             </div>
           </div>
-            <div class="netral_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
+          {% endif %}
+          {% if countNetral > 0 %}
+          <div class="netral_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
             <p class="normal-case text-xl font-bold mb-2 flex justify-center">Netral Word</p>
             <div class="flex justify-center">
               <img src="{{ url_for('save_predwordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
             </div>
           </div>
+          {% endif %}
+          {% if countNegative > 0 %}
           <div class="negative_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
             <p class="normal-case text-xl font-bold mb-2 flex justify-center">Negative Word</p>
             <div class="flex justify-center">
               <img src="{{ url_for('save_predwordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
             </div>
           </div>            
+          {% endif %}
         </div>
         {% elif status == 'complete' and data['result'] and data['processed_features'] %}
         <p class="normal-case text-xl font-bold mb-2">Hasil Preprocessing : "{{data['processed_features'][0]}}"</p>

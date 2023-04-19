@@ -41,7 +41,6 @@ def train():
         if file.filename == '':
             flash('File Tidak Boleh Kosong')
         elif file.filename.split('.')[-1] != 'xlsx':
-            print(file.filename.split('.')[-1])
             flash('Ekstensi File Tidak Sesuai')
         else:
             if not os.path.exists('TrainData'):
@@ -69,7 +68,6 @@ def predict_file():
         if file.filename == '':
             flash('File Tidak Boleh Kosong')
         elif file.filename.split('.')[-1] != 'xlsx':
-            print(file.filename.split('.')[-1])
             flash('Ekstensi File Tidak Sesuai')
         else:
             if not os.path.exists('TestData'):
@@ -81,10 +79,7 @@ def predict_file():
             
             positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = startPredict('Model/svm.pkl', 'TestData/Test.xlsx')
             
-            print(positiveWords, negativeWords, netralWords)
-            print(countNegative, countNetral, countPositive)
-
-            return render_template('predict.html', status = status, data = json.dumps({'positiveWords': positiveWords, 'netralWords': netralWords, 'negativeWords': negativeWords, 'countPositive': countPositive, 'countNetral': countNetral, 'countNegative': countNegative}))
+            return render_template('predict.html', status = status, countPositive = countPositive, countNetral = countNetral, countNegative = countNegative, data = json.dumps({'positiveWords': positiveWords, 'netralWords': netralWords, 'negativeWords': negativeWords, 'countPositive': countPositive, 'countNetral': countNetral, 'countNegative': countNegative}))
     
     return render_template('predict.html', status = status)
 
