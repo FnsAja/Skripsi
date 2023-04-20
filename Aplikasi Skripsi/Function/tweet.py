@@ -12,7 +12,7 @@ def query(name, start_date, end_date):
 def appendData(query):
     tweets = []
     for tweet in sntwitter.TwitterSearchScraper(query, maxEmptyPages=1000).get_items():
-        tweets.append([tweet.date, ' ',str(tweet.rawContent)])
+        tweets.append([tweet.date.strftime("%c"), ' ',str(tweet.rawContent)])
 
     return tweets
 
