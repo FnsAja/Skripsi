@@ -58,9 +58,9 @@
           </form>
         </div>
 
-        {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
         
-        <div class="content">
+        <div class="content-body">
+          {% if status == 'complete' and not data['result'] and not data['processed_features'] %}
           <div class="Predict_chart bg-white rounded-lg my-3 p-4 w-full">
             <p class="normal-case text-xl font-bold mb-2 flex justify-center">Chart Predict Data</p>
             <div class="chart-container h-96">
@@ -91,11 +91,12 @@
             </div>
           </div>            
           {% endif %}
+
+          {% elif status == 'complete' and data['result'] and data['processed_features'] %}
+          <p class="normal-case text-xl font-bold mb-2">Hasil Preprocessing : "{{data['processed_features'][0]}}"</p>
+          <p class="normal-case text-xl font-bold mb-2">Sentiment : {{ data['result'] }}</p>
+          {% endif %}        
         </div>
-        {% elif status == 'complete' and data['result'] and data['processed_features'] %}
-        <p class="normal-case text-xl font-bold mb-2">Hasil Preprocessing : "{{data['processed_features'][0]}}"</p>
-        <p class="normal-case text-xl font-bold mb-2">Sentiment : {{ data['result'] }}</p>
-        {% endif %}        
       </div>
     </div>
     

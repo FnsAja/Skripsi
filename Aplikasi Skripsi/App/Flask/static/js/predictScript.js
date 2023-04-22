@@ -10,6 +10,8 @@ $('input[name="radio"]').on('change',(e) => {
     $('.form-file').hide()
     $('.form-text').show()
   }
+
+  $('.content-body').hide()
 });
 
 let count = [data['countNegative'], data['countNetral'], data['countPositive']] ?? []
