@@ -3,7 +3,13 @@
 {% endwith %}
 
   <body>
-    {% include "component/navbar.html" %}
+    <div class="navbar">
+      <div class="px-10 py-0 mb-10 bg-blue-100 border-2 border-b-orange-600">
+          <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/scrap">Scrap</a>
+          <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/train">Train</a>
+          <a class="btn normal-case text-sm rounded-md px-3 py-2 hover:text-black hover:font-bold" href="/predict">Predict</a>
+      </div>
+    </div>
 
     <div class="loading max-w-screen-lg mx-auto pb-10 flex justify-center" style="display: none;">
       <img src="../static/img/loading.gif" class="mx-auto rounded-full">
