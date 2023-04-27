@@ -75,36 +75,42 @@
         <div class="chart-container h-96">
           <canvas id="pieChart"></canvas>
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>
       <div class="confusion_matrix relative bg-white rounded-lg my-3 p-4 w-full">
         <p class="normal-case text-xl font-bold mb-2 flex justify-center">Confusion Matrix</p>
         <div class="flex justify-center">
           <img src="{{ url_for('save_trainPlot_image') }}" alt="Plot Image">
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>
       <div class="hyperplane_plot relative bg-white rounded-lg my-3 p-4 w-full">
         <p class="normal-case text-xl font-bold mb-2 flex justify-center">SVM Area</p>
         <div class="flex justify-center">
           <img src="{{ url_for('save_trainChart_image') }}" alt="Plot Image">        
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>
       <div class="positive_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
         <p class="normal-case text-xl font-bold mb-2 flex justify-center">Positive Word</p>
         <div class="flex justify-center">
           <img src="{{ url_for('save_wordcloud_image', name = 'Positive') }}" alt="WordCloud Image">
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>
       <div class="netral_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
         <p class="normal-case text-xl font-bold mb-2 flex justify-center">Netral Word</p>
         <div class="flex justify-center">
           <img src="{{ url_for('save_wordcloud_image', name = 'Netral') }}" alt="WordCloud Image">
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>
       <div class="negative_wordcloud relative bg-white rounded-lg my-3 p-4 w-full">
         <p class="normal-case text-xl font-bold mb-2 flex justify-center">Negative Word</p>
         <div class="flex justify-center">
           <img src="{{ url_for('save_wordcloud_image', name = 'Negative') }}" alt="WordCloud Image">
         </div>
+        <p class="normal-case text-sm my-2">*note : Data diatas berasal dari fold ke - {{ fold }}</p>
       </div>        
     </div>
   </div>

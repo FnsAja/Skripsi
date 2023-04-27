@@ -21,14 +21,19 @@ def redir():
 def scrap():
     if request.method == 'POST':
         name = request.form['name']
-        start = request.form['start']
-        end = request.form['end']
+        # start = request.form['start']
+        # end = request.form['end']
 
-        if name == '' or start == None or end == None:
+        if name == '':
             flash('Pilihan tidak boleh kosong')
         else:
-            insertToExcel(name, start, end)
-            return render_template('get_data.html', status = 'complete', name = name)
+            # insertToExcel(name, start, end)
+            # return render_template('get_data.html', status = 'complete', name = name)
+            return send_file(
+                f'Data/output_{name}.xlsx',
+                download_name='Data.xlsx',
+                as_attachment=True
+            )
         
     return render_template('get_data.html', pesan = pesan)
 
@@ -55,7 +60,7 @@ def train():
             best_fold.pop("x_test")
             best_fold.pop("y_test")
 
-            return render_template('train.html', status = status, best_fold = json.dumps(best_fold), all_fold = json.dumps(all_fold), df_value = df_value)
+            return render_template('train.html', status = status, fold = best_fold['fold'], best_fold = json.dumps(best_fold), all_fold = json.dumps(all_fold), df_value = df_value)
         
     return render_template('train.html', status = status)
 
