@@ -11,9 +11,9 @@
       </div>
     </div>
 
-    <div class="loading max-w-screen-lg mx-auto pb-10 flex justify-center" style="display: none;">
+    <div class="loading h-96 mx-auto pb-10 flex justify-center" style="display: none;">
       <img src="../static/img/loading.gif" class="mx-auto rounded-full">
-      <p class="absolute top-80 text-black font-bold">Mohon tunggu, data sedang diproses...</p>
+      <!-- <p class="absolute top-80 text-black font-bold">Mohon tunggu, data sedang diproses...</p> -->
     </div>
     <div class="content px-24 py-5">
       <h2 class="normal-case text-2xl font-bold text-center pb-8">Halaman Predict <br> Analysis Pemilihan Calon Presiden 2024</h2>
@@ -115,7 +115,7 @@
       endLoading();
     </script>
     {% endif %}
-     
+    {% include "component/footer.html" %}
     
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/chartJs.js"></script>
