@@ -13,7 +13,6 @@
   
   <div class="loading h-96 mx-auto pb-10 flex justify-center" style="display: none;">
     <img src="../static/img/loading.gif" class="mx-auto rounded-full">
-    <!-- <p class="absolute top-80 text-black font-bold">Mohon tunggu, data sedang diproses...</p> -->
   </div>
   <div class="content px-24 py-5">
     <h2 class="normal-case text-2xl font-bold text-center pb-8">Halaman Train Data <br> Sentiment Analysis Pemilihan Calon Presiden 2024</h2>
@@ -29,13 +28,10 @@
         {% endif %}
       {% endwith %}
       
-      <form action="/train" method="post" enctype="multipart/form-data">
+      <form enctype="multipart/form-data" action="/train" method="POST">
         <div class="form-input py-4">
           <input type="file" name="file" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
           <button type="submit" onclick="loading()" class="btn hover:cursor-pointer font-bold bg-violet-400 px-2 py-2 mt-4 rounded-lg w-52">Train Model</button>
-          <!-- {% if status == 'complete' %}
-          <button onclick="location.href='/saveFileTest'" type="button" class="btn hover:cursor-pointer font-bold bg-blue-400 px-2 py-2 rounded-lg">Unduh File Test disini</a>                            
-          {% endif %} -->
           {% if status != 'complete' %}
           <p class="normal-case text-md text-grey mt-10 flex justify-start">*Note Data harus dalam bentuk Excel!</p>
           {% endif %}
