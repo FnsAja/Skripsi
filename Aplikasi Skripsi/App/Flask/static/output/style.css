@@ -536,6 +536,10 @@ a{
   font-family: 'Montserrat', sans-serif;
 }
 
+.fixed{
+  position: fixed;
+}
+
 .absolute{
   position: absolute;
 }
@@ -546,6 +550,18 @@ a{
 
 .top-80{
   top: 20rem;
+}
+
+.bottom-0{
+  bottom: 0px;
+}
+
+.left-0{
+  left: 0px;
+}
+
+.right-0{
+  right: 0px;
 }
 
 .col-span-2{
@@ -607,16 +623,16 @@ a{
   margin-top: 2.5rem;
 }
 
+.mt-32{
+  margin-top: 8rem;
+}
+
 .mt-4{
   margin-top: 1rem;
 }
 
 .mt-8{
   margin-top: 2rem;
-}
-
-.mt-32{
-  margin-top: 8rem;
 }
 
 .block{
@@ -645,18 +661,6 @@ a{
 
 .h-full{
   height: 100%;
-}
-
-.h-64{
-  height: 16rem;
-}
-
-.max-h-64{
-  max-height: 16rem;
-}
-
-.max-h-96{
-  max-height: 24rem;
 }
 
 .w-2\/3{
@@ -847,11 +851,6 @@ a{
 .py-5{
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
-}
-
-.py-10{
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
 }
 
 .pb-10{
