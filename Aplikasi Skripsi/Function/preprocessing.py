@@ -317,9 +317,9 @@ def trainModel(labels, processed_features):
         
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
 
-    sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
-    for index, fold in enumerate(sorted_fold):
-        print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
+    # sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
+    # for index, fold in enumerate(sorted_fold):
+    #     print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
         
     df_value = []
     words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()

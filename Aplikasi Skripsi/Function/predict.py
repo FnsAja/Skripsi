@@ -10,8 +10,9 @@ def loadModel(path):
 def loadData(path):
     tweets = pd.read_excel(path, sheet_name="Sheet1")
     features = tweets.loc[:, 'Tweet'].values
+    month = tweets.loc[:, 'Bulan'].values
     
-    return features
+    return features, month
 
 def generateDataWordCloud(processed_features, predict_result):
     positiveWords = ''
@@ -39,7 +40,7 @@ def generateDataWordCloud(processed_features, predict_result):
 
 def startPredict(pathModel, pathData):
     clf = loadModel(pathModel)
-    features = loadData(pathData)
+    features, month = loadData(pathData)
     processed_features = preprocessing.preprocessing(features=features)
     result = clf.predict(processed_features)
     positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = generateDataWordCloud(processed_features=processed_features, predict_result=result)
@@ -51,7 +52,7 @@ def startPredict(pathModel, pathData):
     if countNetral > 0:
         preprocessing.generateWordCloud(netralWords, "Netral", "Test")
 
-    data = {'Predict Result': result, 'Tweet': features}
+    data = {'Bulan': month, 'Predict Result': result, 'Tweet': features}
 
     df = pd.DataFrame(data)
     df.to_excel('Process/DataPredict.xlsx')
