@@ -19,6 +19,11 @@ from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from wordcloud import WordCloud
 
+def find_fold(curr, total):
+    closest = min(total, key=lambda x: abs(x - curr))
+    closest_index = total.index(closest)
+    return closest_index
+
 def longWordRemoval(sentence):
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
     return pattern.sub(r"\1", sentence)
@@ -149,9 +154,8 @@ def trainModel(labels, processed_features):
     positiveWords = ''
     netralWords = ''
     negativeWords = ''
-    best_fold = {
-        "f1": 0
-    }
+
+    best_fold = {}
     all_fold = []
     temp_fold = {}
         
@@ -173,45 +177,6 @@ def trainModel(labels, processed_features):
             mean_list.append(sum(temp_list))
 
         X_test_numpy = numpy.array(mean_list)
-
-        # X_train = vectorizers.fit_transform(X_train)
-        # X_test = vectorizers.transform(X_test)
-        
-        # Train
-        # clf.fit(X_train, y_train)
-        # y_predict = clf.predict(X_test)
-                        
-        # Prepare Data
-        # pca = PCA(n_components=2)
-        # X_test_np = numpy.array(X_test.todense())
-        # timesTen = lambda x: x * 10
-        # X_test_np = timesTen(X_test_np)
-        
-        # pca.fit(X_test_np, y_test)
-        # data2D = pca.fit_transform(X_test_np, y_test)
-        # clf.fit(data2D, y_test)
-        
-        # x_min, x_max = data2D[:, 0].min() - 1, data2D[:, 0].max() + 1
-        # y_min, y_max = data2D[:, 1].min() - 1, data2D[:, 1].max() + 1
-        # xx, yy = numpy.meshgrid(numpy.arange(x_min, x_max, 0.02), numpy.arange(y_min, y_max, 0.02))
-                
-        # Z = clf.predict(numpy.c_[xx.ravel(), yy.ravel()])
-        # Z = Z.reshape(xx.shape)
-        
-        # plt.subplot(3, 4, i)
-        # plt.subplots_adjust(wspace=0.4, hspace=0.4)
-        # plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.4)
-        # plt.scatter(data2D[y_test == 1, 0], data2D[y_test == 1, 1], c=y_test[y_test == 1], edgecolor="k")
-        # plt.scatter(data2D[y_test == 0, 0], data2D[y_test == 0, 1], c=y_test[y_test == -0], edgecolor="k")
-        # plt.scatter(data2D[y_test == -1, 0], data2D[y_test == -1, 1], c=y_test[y_test == -1], edgecolor="k")
-        # plt.axis([x_min, x_max, y_min, y_max])
-        # plt.savefig('TrainData/TrainChart.png')
-        # colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
-        # markers = ('s', 'x', 'o', '^', 'v')
-        # for idx, cl in enumerate(numpy.unique(y_test)):
-        #     plt.scatter(x = data2D[y_test == cl, 0], y = data2D[y_test == cl, 1], alpha = 0.8, c = colors[idx], marker = markers[idx], label = cl)
-        #     plt.scatter(data2D[:, 0], data2D[:, 1], c=labels[test_index], marker='x', cmap=plt.cm.coolwarm, s=20, edgecolors='k')
-        #     plt.savefig('TrainData/TrainChart.png')
                   
         countNetral = 0  
         countPositive = 0  
@@ -225,10 +190,6 @@ def trainModel(labels, processed_features):
         trueNetral = 0
             
         for index, content in enumerate(y_predict):
-            # Prediksi Salah
-            # if content != labels[test_index][index]:        
-            #     print(f"Fold {i} Isi {processed_features[test_index[index]]} Labels {content} Correct {labels[test_index[index]]}")
-            
             # Jumlah Positif, Negatif dan Netral
             if content == 0:
                 countNetral += 1  
@@ -266,38 +227,9 @@ def trainModel(labels, processed_features):
         confusion_matrix = numpy.fliplr(confusion_matrix)
         score_cm = metrics.classification_report(y_test, y_predict, zero_division=0, output_dict=True)
         accuracy = metrics.accuracy_score(y_test, y_predict)
-
-        if best_fold['f1'] < score_cm['macro avg']['f1-score']:
-            best_fold['fold'] = i
-            best_fold['clf'] = tfIdf_svm
-            best_fold['accuracy'] = accuracy
-            best_fold['precision'] = score_cm['macro avg']['precision']
-            best_fold['recall'] = score_cm['macro avg']['recall']
-            best_fold['f1'] = score_cm['macro avg']['f1-score']
-            best_fold['score_cm'] = score_cm
-            best_fold['confusion_matrix'] = confusion_matrix.tolist()
-            best_fold['count'] = [countPositive, countNetral, countNegative]
-            best_fold['true'] = [truePositive, trueNetral, trueNegative]
-            best_fold['false'] = [falsePositive, falseNetral, falseNegative]
-            best_fold['x_test'] = X_test_numpy
-            best_fold['y_test'] = y_test
-            
-            matplotlib.use('agg')
-            result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
-            model = clf.fit(result[:, :2], best_fold['y_test'])
-            display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
-            display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
-            display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
-            display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
-            display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], marker='+')
-            plt.savefig('TrainData/TrainChart.png')
-            
-            cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
-            cm_display.plot()
-            plt.savefig('TrainData/TrainPlot.png')
-            matplotlib.pyplot.close()
         
         temp_fold['fold'] = i
+        temp_fold['clf'] = tfIdf_svm
         temp_fold['accuracy'] = accuracy
         temp_fold['precision'] = score_cm['macro avg']['precision']
         temp_fold['recall'] = score_cm['macro avg']['recall']
@@ -307,11 +239,48 @@ def trainModel(labels, processed_features):
         temp_fold['count'] = [countPositive, countNetral, countNegative]
         temp_fold['true'] = [truePositive, trueNetral, trueNegative]
         temp_fold['false'] = [falsePositive, falseNetral, falseNegative]
+        temp_fold['x_test'] = X_test_numpy
+        temp_fold['y_test'] = y_test
         
         all_fold.append(temp_fold.copy())
 
         i += 1
+    
+    sum_f1 = 0.0
+    fold_i = []
+    for index, fold in enumerate(all_fold):
+        fold_i.append(fold['f1'])
+        sum_f1 += fold_i[index]
+    mean_f1 = sum_f1 / 10
+    best_fold['fold'] = find_fold(mean_f1, fold_i) + 1
+    best_fold['clf'] = tfIdf_svm
+    best_fold['accuracy'] = accuracy
+    best_fold['precision'] = score_cm['macro avg']['precision']
+    best_fold['recall'] = score_cm['macro avg']['recall']
+    best_fold['f1'] = score_cm['macro avg']['f1-score']
+    best_fold['score_cm'] = score_cm
+    best_fold['confusion_matrix'] = confusion_matrix.tolist()
+    best_fold['count'] = [countPositive, countNetral, countNegative]
+    best_fold['true'] = [truePositive, trueNetral, trueNegative]
+    best_fold['false'] = [falsePositive, falseNetral, falseNegative]
+    best_fold['x_test'] = X_test_numpy
+    best_fold['y_test'] = y_test
         
+    matplotlib.use('agg')
+    result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
+    model = clf.fit(result[:, :2], best_fold['y_test'])
+    display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
+    display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
+    display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
+    display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
+    display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], marker='+')
+    plt.savefig('TrainData/TrainChart.png')
+            
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
+    cm_display.plot()
+    plt.savefig('TrainData/TrainPlot.png')
+    matplotlib.pyplot.close()
+            
     if not os.path.exists('Model'):
         os.mkdir('Model')
         
