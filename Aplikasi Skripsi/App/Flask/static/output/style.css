@@ -548,10 +548,6 @@ a{
   position: relative;
 }
 
-.top-80{
-  top: 20rem;
-}
-
 .bottom-0{
   bottom: 0px;
 }
@@ -562,6 +558,10 @@ a{
 
 .right-0{
   right: 0px;
+}
+
+.top-80{
+  top: 20rem;
 }
 
 .col-span-2{
