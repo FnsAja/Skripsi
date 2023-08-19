@@ -285,8 +285,9 @@ def trainModel(labels, processed_features):
         os.mkdir('Model')
         
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
-    print(best_fold.keys())
-    del best_fold['clf']
+    best_fold['clf'] = 0
+    for interate in all_fold:
+        interate['clf'] = 0
 
     # sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
     # for index, fold in enumerate(sorted_fold):
