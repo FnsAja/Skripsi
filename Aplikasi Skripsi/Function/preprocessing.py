@@ -12,8 +12,8 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn import svm, metrics
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.model_selection import KFold
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
@@ -147,9 +147,19 @@ def trainModel(labels, processed_features):
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
     clf = svm.SVC(kernel="rbf")
     vectorizers = TfidfVectorizer()
-    tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     processed_features = numpy.array(processed_features)
     all_tfidf = vectorizers.fit_transform(processed_features)
+    param_grid = {
+        'C': [0.1, 1, 10, 100, 1000, 10000],
+        'gamma': [0.001, 0.01, 0.1, 1, 10, 100]
+    }
+    grid_search = GridSearchCV(clf, param_grid, cv=kf, scoring='f1_macro')
+    grid_search.fit(all_tfidf, labels)
+    best_params = grid_search.best_params_
+    best_score = grid_search.best_score_
+    clf = svm.SVC(kernel="rbf", C=best_params['C'], gamma=best_params['gamma'])
+    print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
+    tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
     
     positiveWords = ''
     netralWords = ''
@@ -252,19 +262,21 @@ def trainModel(labels, processed_features):
         fold_i.append(fold['f1'])
         sum_f1 += fold_i[index]
     mean_f1 = sum_f1 / 10
+    print(f"Rata-rata f1-score untuk 10 fold adalah {mean_f1}")
+    
     best_fold['fold'] = find_fold(mean_f1, fold_i) + 1
-    best_fold['clf'] = tfIdf_svm
-    best_fold['accuracy'] = accuracy
-    best_fold['precision'] = score_cm['macro avg']['precision']
-    best_fold['recall'] = score_cm['macro avg']['recall']
-    best_fold['f1'] = score_cm['macro avg']['f1-score']
-    best_fold['score_cm'] = score_cm
-    best_fold['confusion_matrix'] = confusion_matrix.tolist()
-    best_fold['count'] = [countPositive, countNetral, countNegative]
-    best_fold['true'] = [truePositive, trueNetral, trueNegative]
-    best_fold['false'] = [falsePositive, falseNetral, falseNegative]
-    best_fold['x_test'] = X_test_numpy
-    best_fold['y_test'] = y_test
+    best_fold['clf'] = all_fold[best_fold['fold']]['clf']
+    best_fold['accuracy'] = all_fold[best_fold['fold']]['accuracy']
+    best_fold['precision'] = all_fold[best_fold['fold']]['precision']
+    best_fold['recall'] = all_fold[best_fold['fold']]['recall']
+    best_fold['f1'] = all_fold[best_fold['fold']]['f1']
+    best_fold['score_cm'] = all_fold[best_fold['fold']]['score_cm']
+    best_fold['confusion_matrix'] = all_fold[best_fold['fold']]['confusion_matrix']
+    best_fold['count'] = all_fold[best_fold['fold']]['count']
+    best_fold['true'] = all_fold[best_fold['fold']]['true']
+    best_fold['false'] = all_fold[best_fold['fold']]['false']
+    best_fold['x_test'] = all_fold[best_fold['fold']]['x_test']
+    best_fold['y_test'] = all_fold[best_fold['fold']]['y_test']
         
     matplotlib.use('agg')
     result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
@@ -289,10 +301,15 @@ def trainModel(labels, processed_features):
     for interate in all_fold:
         interate['clf'] = 0
 
-    # sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
-    # for index, fold in enumerate(sorted_fold):
-    #     print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
-        
+    temp_fold = all_fold
+    all_fold = []
+    for iterate in temp_fold:
+        all_fold.append({'fold': iterate['fold'], 'f1': iterate['f1'], 'recall': iterate['recall'], 'precision': iterate['precision'], 'accuracy': iterate['accuracy']})
+
+    sorted_fold = sorted(all_fold, key=lambda x: x['f1'], reverse=True)
+    for index, fold in enumerate(sorted_fold):
+        print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
+
     df_value = []
     words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()
     for index, word in enumerate(words_list):
