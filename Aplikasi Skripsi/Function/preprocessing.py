@@ -153,13 +153,11 @@ def trainModel(labels, processed_features):
         'C': [0.1, 1, 10, 100, 1000, 10000],
         'gamma': [0.001, 0.01, 0.1, 1, 10, 100]
     }
-    grid_search = GridSearchCV(clf, param_grid, cv=kf, scoring='f1_macro')
-    grid_search.fit(all_tfidf, labels)
-    best_params = grid_search.best_params_
-    best_score = grid_search.best_score_
-    clf = svm.SVC(kernel="rbf", C=best_params['C'], gamma=best_params['gamma'])
-    print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
-    tfIdf_svm = Pipeline([('tfidf', vectorizers), ('svc', clf)])
+    grid_search = GridSearchCV(clf, param_grid, scoring='f1_macro')
+    # grid_search.fit(all_tfidf, labels)
+    # best_params = grid_search.best_params_
+    # print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
+    # clf = grid_search.best_estimator_
     
     positiveWords = ''
     netralWords = ''
@@ -174,9 +172,13 @@ def trainModel(labels, processed_features):
         X_train, X_test = processed_features[train_index], processed_features[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
         
-        tfIdf_svm.fit(X_train, y_train)
-        y_predict = tfIdf_svm.predict(X_test)
-        X_test = tfIdf_svm.named_steps['tfidf'].transform(X_test)
+        X_train = vectorizers.fit(X_train)
+        X_test = vectorizers.transform(X_test)
+        grid_search.fit(X_train, y_train)
+        best_params = grid_search.best_params_
+        print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
+        clf = grid_search.best_estimator_
+        y_predict = clf.predict(X_test)
         
         rows, cols = X_test.nonzero()
         data = {"row": rows, "col": cols, "data": X_test.data}
@@ -239,7 +241,7 @@ def trainModel(labels, processed_features):
         accuracy = metrics.accuracy_score(y_test, y_predict)
         
         temp_fold['fold'] = i
-        temp_fold['clf'] = tfIdf_svm
+        temp_fold['clf'] = clf
         temp_fold['accuracy'] = accuracy
         temp_fold['precision'] = score_cm['macro avg']['precision']
         temp_fold['recall'] = score_cm['macro avg']['recall']
@@ -297,6 +299,7 @@ def trainModel(labels, processed_features):
         os.mkdir('Model')
         
     joblib.dump(best_fold['clf'], 'Model/svm.pkl')
+    joblib.dump(vectorizers, 'Model/tfidf.pkl')
     best_fold['clf'] = 0
     for interate in all_fold:
         interate['clf'] = 0
@@ -311,7 +314,7 @@ def trainModel(labels, processed_features):
         print(f"Urutan ke {index + 1} Fold ke {fold['fold']} f1-score {fold['f1']}")
 
     df_value = []
-    words_list = tfIdf_svm.named_steps['tfidf'].get_feature_names_out()
+    words_list = vectorizers.get_feature_names_out()
     for index, word in enumerate(words_list):
         df = numpy.sum(all_tfidf[:, index] > 0)
         df_value.append({'word': word, 'df': df})
@@ -319,9 +322,13 @@ def trainModel(labels, processed_features):
     return best_fold, all_fold, positiveWords, netralWords, negativeWords, df_value
 
 def startTrain(data_source_url):
+    print('Preparing Data...')
     features, labels = prepareData(data_source_url=data_source_url)
+    print('Preprocessing...')
     processed_features = preprocessing(features=features)
+    print('Train Model...')
     best_fold, all_fold, positiveWords, netralWords, negativeWords, df_value = trainModel(labels=labels, processed_features=processed_features)
+    print('Generating Wordcloud...')
     generateWordCloud(positiveWords, "Positive", "Train")
     generateWordCloud(netralWords, "Netral", "Train")
     generateWordCloud(negativeWords, "Negative", "Train")

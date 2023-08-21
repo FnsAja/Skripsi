@@ -40,9 +40,11 @@ def generateDataWordCloud(processed_features, predict_result):
 
 def startPredict(pathModel, pathData):
     clf = loadModel(pathModel)
+    tfidf = loadModel('Model/tfidf.pkl')
     features, month = loadData(pathData)
     processed_features = preprocessing.preprocessing(features=features)
-    result = clf.predict(processed_features)
+    transformed_features = tfidf.transform(processed_features)
+    result = clf.predict(transformed_features)
     positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = generateDataWordCloud(processed_features=processed_features, predict_result=result)
 
     if countPositive > 0:
@@ -60,8 +62,11 @@ def startPredict(pathModel, pathData):
     return positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative
 
 def startPredictt(pathModel, text: str):
+    print('Loading Model...')
     clf = loadModel(pathModel)
+    print('Preprocessing...')
     processed_features = preprocessing.preprocessing(features=[text])
+    print('Predict Data...')
     result = clf.predict(processed_features)
     sentiment = ['Netral', 'Positive', 'Negative']
     result = sentiment[result[0]]
