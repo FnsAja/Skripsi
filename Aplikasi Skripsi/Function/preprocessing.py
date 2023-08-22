@@ -154,10 +154,11 @@ def trainModel(labels, processed_features):
         'gamma': [0.001, 0.01, 0.1, 1, 10, 100]
     }
     grid_search = GridSearchCV(clf, param_grid, scoring='f1_macro')
-    # grid_search.fit(all_tfidf, labels)
-    # best_params = grid_search.best_params_
-    # print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
-    # clf = grid_search.best_estimator_
+    grid_search.fit(all_tfidf, labels)
+    best_params = grid_search.best_params_
+    clf = svm.SVC(kernel='rbf', C=best_params['C'], gamma=best_params['gamma'])
+    print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
+    model = Pipeline([('tfidf', TfidfVectorizer()), ('svc', clf)])
     
     positiveWords = ''
     netralWords = ''
@@ -171,15 +172,11 @@ def trainModel(labels, processed_features):
     for train_index, test_index in kf.split(processed_features, labels):
         X_train, X_test = processed_features[train_index], processed_features[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
-        
-        X_train = vectorizers.fit(X_train)
+
+        model.fit(X_train, y_train)
         X_test = vectorizers.transform(X_test)
-        grid_search.fit(X_train, y_train)
-        best_params = grid_search.best_params_
-        print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
-        clf = grid_search.best_estimator_
-        y_predict = clf.predict(X_test)
-        
+        y_predict = model.predict(X_test)
+
         rows, cols = X_test.nonzero()
         data = {"row": rows, "col": cols, "data": X_test.data}
         df = pd.DataFrame(data=data)
@@ -241,7 +238,8 @@ def trainModel(labels, processed_features):
         accuracy = metrics.accuracy_score(y_test, y_predict)
         
         temp_fold['fold'] = i
-        temp_fold['clf'] = clf
+        temp_fold['clf'] = model
+        temp_fold['params'] = [best_params['C'], best_params['gamma']]
         temp_fold['accuracy'] = accuracy
         temp_fold['precision'] = score_cm['macro avg']['precision']
         temp_fold['recall'] = score_cm['macro avg']['recall']
@@ -268,6 +266,7 @@ def trainModel(labels, processed_features):
     
     best_fold['fold'] = find_fold(mean_f1, fold_i) + 1
     best_fold['clf'] = all_fold[best_fold['fold']]['clf']
+    best_fold['params'] = all_fold[best_fold['fold']]['params']
     best_fold['accuracy'] = all_fold[best_fold['fold']]['accuracy']
     best_fold['precision'] = all_fold[best_fold['fold']]['precision']
     best_fold['recall'] = all_fold[best_fold['fold']]['recall']
