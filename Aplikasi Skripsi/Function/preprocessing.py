@@ -158,7 +158,7 @@ def trainModel(labels, processed_features):
     best_params = grid_search.best_params_
     clf = svm.SVC(kernel='rbf', C=best_params['C'], gamma=best_params['gamma'])
     print(f"Parameter terbaik untuk data berikut adalah C :{best_params['C']} dan gamma: {best_params['gamma']}")
-    model = Pipeline([('tfidf', TfidfVectorizer()), ('svc', clf)])
+    tfidf_svm = Pipeline([('tfidf', TfidfVectorizer()), ('svc', clf)])
     
     positiveWords = ''
     netralWords = ''
@@ -173,9 +173,9 @@ def trainModel(labels, processed_features):
         X_train, X_test = processed_features[train_index], processed_features[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
 
-        model.fit(X_train, y_train)
+        tfidf_svm.fit(X_train, y_train)
+        y_predict = tfidf_svm.predict(X_test)
         X_test = vectorizers.transform(X_test)
-        y_predict = model.predict(X_test)
 
         rows, cols = X_test.nonzero()
         data = {"row": rows, "col": cols, "data": X_test.data}
@@ -238,7 +238,7 @@ def trainModel(labels, processed_features):
         accuracy = metrics.accuracy_score(y_test, y_predict)
         
         temp_fold['fold'] = i
-        temp_fold['clf'] = model
+        temp_fold['clf'] = tfidf_svm
         temp_fold['params'] = [best_params['C'], best_params['gamma']]
         temp_fold['accuracy'] = accuracy
         temp_fold['precision'] = score_cm['macro avg']['precision']
@@ -280,15 +280,6 @@ def trainModel(labels, processed_features):
     best_fold['y_test'] = all_fold[best_fold['fold']]['y_test']
         
     matplotlib.use('agg')
-    result = numpy.column_stack((best_fold['x_test'].data, best_fold['y_test']))
-    model = clf.fit(result[:, :2], best_fold['y_test'])
-    display = DecisionBoundaryDisplay.from_estimator(model, result[:, :2], response_method="predict", alpha=0.5)
-    display.plot(plot_method="contourf", xlabel="Test Features", ylabel="Predicted Labels")
-    display.ax_.scatter(result[best_fold['y_test'] == -1, 0], result[best_fold['y_test'] == -1, 1], edgecolors="black", marker='X')
-    display.ax_.scatter(result[best_fold['y_test'] == 0, 0], result[best_fold['y_test'] == 0, 1], edgecolors="black", marker='o')
-    display.ax_.scatter(result[best_fold['y_test'] == 1, 0], result[best_fold['y_test'] == 1, 1], marker='+')
-    plt.savefig('TrainData/TrainChart.png')
-            
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=["Positive", "Netral", "Negative"])
     cm_display.plot()
     plt.savefig('TrainData/TrainPlot.png')

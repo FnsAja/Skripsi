@@ -39,12 +39,14 @@ def generateDataWordCloud(processed_features, predict_result):
     return positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative
 
 def startPredict(pathModel, pathData):
+    print('Loading Model...')
     clf = loadModel(pathModel)
     tfidf = loadModel('Model/tfidf.pkl')
     features, month = loadData(pathData)
+    print('Preprocessing...')
     processed_features = preprocessing.preprocessing(features=features)
-    transformed_features = tfidf.transform(processed_features)
-    result = clf.predict(transformed_features)
+    print('Predict Data...')
+    result = clf.predict(processed_features)
     positiveWords, netralWords, negativeWords, countPositive, countNetral, countNegative = generateDataWordCloud(processed_features=processed_features, predict_result=result)
 
     if countPositive > 0:
