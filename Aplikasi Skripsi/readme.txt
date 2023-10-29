@@ -4,3 +4,6 @@ Cara menjalankan program:
 3. Lalu jalankan command "cd .\Flask\"
 4. Lalu jalankan "flask --app main run --debug"
 5. Lalu ketikan url berikut pada browser "127.0.0.1:5000"
+
+Program ini dibuat menggunakan python dengan framework "Flask", yang berupa website dengan beberapa fitur machine learning didalamnya.
+Algoritma yang digunakan adalah Support Vector Machine dengan metode validasi menggunakan 10 Fold Cross Validation dan Confusion Matrix.
