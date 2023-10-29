@@ -7,17 +7,17 @@ import os
 import lib.tesaurus.tesaurus as ts
 import matplotlib.pyplot as plt
 import matplotlib
-import statistics as st
+import nltk
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn import svm, metrics
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from wordcloud import WordCloud
+nltk.download()
 
 def find_fold(curr, total):
     closest = min(total, key=lambda x: abs(x - curr))
